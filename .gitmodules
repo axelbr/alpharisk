@@ -1,0 +1,3 @@
+[submodule "sge-risk"]
+	path = sge-risk
+	url = https://gitlab.com/StrategyGameEngine/sge-risk.git
