@@ -15,34 +15,36 @@
  *
  */
 
-package at.ac.tuwien.ifs.sge.agent.alpharisk.environment;
+package at.ac.tuwien.ifs.sge.agent.alpharisk.model;
 
 
+import ai.djl.ndarray.NDArray;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.config.MuZeroConfig;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.play.Action;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
-/**
- * The environment the agent is interacting with by applying actions and receiving rewards and new observations
- * of whatever the environment reveals about its new internal states.
- */
-public interface Environment {
-    /**
-     * applies an action and gets immediate reward
-     *
-     * @return immediate reward
-     */
-    float step(Action action);
+
+@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+public class NetworkIO {
+
+    private float[] policyValues;
+    private double value;
+
+    private double reward;
+
+    private NDArray hiddenState;
+    private Action action;
+    private MuZeroConfig config;
 
 
-    // the environment reveals the following information abouts its state
-    int[][] currentImage();
+    private List<NDArray> actionList;
 
-    boolean terminal();
-
-    List<Action> legalActions();
-
-
-    // general information about the environment
-    List<Action> allActionsInActionSpace();
 }

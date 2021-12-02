@@ -17,7 +17,7 @@
 
 package at.ac.tuwien.ifs.sge.agent.alpharisk.environment;
 
-import at.ac.tuwien.ifs.sge.agent.alpharisk.agent.slow.play.Player;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.play.Player;
 import org.jetbrains.annotations.NotNull;
 
 

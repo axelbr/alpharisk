@@ -26,12 +26,12 @@ import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.EasyTrain;
 import ai.djl.training.Trainer;
 import ai.djl.training.dataset.Batch;
-import at.ac.tuwien.ifs.sge.agent.alpharisk.agent.fast.model.Network;
-import at.ac.tuwien.ifs.sge.agent.alpharisk.agent.fast.model.djl.MySaveModelTrainingListener;
-import at.ac.tuwien.ifs.sge.agent.alpharisk.agent.fast.model.djl.NetworkHelper;
-import at.ac.tuwien.ifs.sge.agent.alpharisk.agent.gamebuffer.GameIO;
-import at.ac.tuwien.ifs.sge.agent.alpharisk.agent.gamebuffer.ReplayBuffer;
-import at.ac.tuwien.ifs.sge.agent.alpharisk.agent.slow.play.PlayManager;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.model.Network;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.model.djl.MySaveModelTrainingListener;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.model.djl.NetworkHelper;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.gamebuffer.GameIO;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.gamebuffer.ReplayBuffer;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.play.PlayManager;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.config.MuZeroConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
@@ -43,7 +43,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static at.ac.tuwien.ifs.sge.agent.alpharisk.agent.fast.model.djl.NetworkHelper.*;
+import static at.ac.tuwien.ifs.sge.agent.alpharisk.model.djl.NetworkHelper.*;
 
 @Slf4j
 public class MuZero {

@@ -18,8 +18,8 @@
 package at.ac.tuwien.ifs.sge.agent.alpharisk.debug;
 
 import at.ac.tuwien.ifs.sge.agent.alpharisk.config.MuZeroConfig;
-import at.ac.tuwien.ifs.sge.agent.alpharisk.agent.gamebuffer.Game;
-import at.ac.tuwien.ifs.sge.agent.alpharisk.agent.gamebuffer.ReplayBuffer;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.gamebuffer.Game;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.gamebuffer.ReplayBuffer;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.config.PlayerMode;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.csv.CSVFormat;
@@ -32,7 +32,7 @@ import java.text.NumberFormat;
 import java.util.List;
 import java.util.stream.IntStream;
 
-import static at.ac.tuwien.ifs.sge.agent.alpharisk.agent.Inference.aiValue;
+import static at.ac.tuwien.ifs.sge.agent.alpharisk.Inference.aiValue;
 
 @Slf4j
 public class ValueExtractor {

@@ -19,7 +19,7 @@ public class McGameNode<A> implements GameNode<A>
     }
     
     public McGameNode(final Game<A, ?> game, final A action) {
-        this(game.doAction((Object)action));
+        this(game.doAction(action));
     }
     
     public McGameNode(final Game<A, ?> game, final int wins, final int plays) {

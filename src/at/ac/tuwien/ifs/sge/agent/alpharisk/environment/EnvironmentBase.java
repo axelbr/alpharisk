@@ -19,7 +19,7 @@ package at.ac.tuwien.ifs.sge.agent.alpharisk.environment;
 
 
 import at.ac.tuwien.ifs.sge.agent.alpharisk.config.MuZeroConfig;
-import at.ac.tuwien.ifs.sge.agent.alpharisk.agent.slow.play.Action;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.play.Action;
 import lombok.Data;
 import org.apache.commons.lang3.NotImplementedException;
 import org.jetbrains.annotations.NotNull;

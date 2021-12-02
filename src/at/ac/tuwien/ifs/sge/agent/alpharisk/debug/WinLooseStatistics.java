@@ -18,9 +18,9 @@
 package at.ac.tuwien.ifs.sge.agent.alpharisk.debug;
 
 import at.ac.tuwien.ifs.sge.agent.alpharisk.config.MuZeroConfig;
-import at.ac.tuwien.ifs.sge.agent.alpharisk.agent.gamebuffer.ReplayBuffer;
-import at.ac.tuwien.ifs.sge.agent.alpharisk.agent.gamebuffer.WinnerStatistics;
-import at.ac.tuwien.ifs.sge.agent.alpharisk.agent.gamebuffer.ZeroSumGame;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.gamebuffer.ReplayBuffer;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.gamebuffer.WinnerStatistics;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.gamebuffer.ZeroSumGame;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.environment.OneOfTwoPlayer;
 import lombok.extern.slf4j.Slf4j;
 
@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static at.ac.tuwien.ifs.sge.agent.alpharisk.agent.gamebuffer.GameIO.getLatestBufferNo;
+import static at.ac.tuwien.ifs.sge.agent.alpharisk.gamebuffer.GameIO.getLatestBufferNo;
 
 @Slf4j
 public class WinLooseStatistics {

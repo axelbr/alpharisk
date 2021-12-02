@@ -19,13 +19,12 @@ package at.ac.tuwien.ifs.sge.agent.alpharisk.config;
 
 import ai.djl.Device;
 import ai.djl.ndarray.NDArray;
-import at.ac.tuwien.ifs.sge.agent.alpharisk.agent.gamebuffer.Game;
-import at.ac.tuwien.ifs.sge.agent.alpharisk.agent.slow.play.Action;
-import at.ac.tuwien.ifs.sge.agent.alpharisk.agent.slow.play.KnownBounds;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.gamebuffer.Game;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.play.Action;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.play.KnownBounds;
 import lombok.Builder;
 import lombok.Data;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Constructor;
 import java.util.List;
@@ -37,8 +36,6 @@ import java.util.function.Function;
 public class MuZeroConfig {
 
     public static boolean hiddenStateRemainOnGPU = false;
-
-
 
     private final PlayerMode playerMode;
 

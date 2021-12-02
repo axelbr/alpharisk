@@ -16,13 +16,26 @@ dependencies {
     implementation group: 'at.ac.tuwien.ifs.sge', name: 'sge-risk', version: '1.0.2'
     // https://mvnrepository.com/artifact/ai.djl/api
     implementation group: 'ai.djl', name: 'api', version: '0.14.0'
-    //also consider to add the game in the same manner
+    // https://mvnrepository.com/artifact/org.projectlombok/lombok
+    compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.22'
+    compileOnly 'org.jetbrains:annotations:23.0.0'
+    // https://mvnrepository.com/artifact/org.apache.commons/commons-math3
+    implementation group: 'org.apache.commons', name: 'commons-math3', version: '3.6.1'
+    // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
+    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.12.0'
+    // https://mvnrepository.com/artifact/commons-io/commons-io
+    implementation group: 'commons-io', name: 'commons-io', version: '2.11.0'
+    // https://mvnrepository.com/artifact/ca.umontreal.iro.simul/ssj
+    implementation group: 'ca.umontreal.iro.simul', name: 'ssj', version: '3.3.1'
+    // https://mvnrepository.com/artifact/org.apache.commons/commons-csv
+    implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.9.0'
+
 }
 
 jar {
     manifest {
         attributes 'Sge-Type': 'agent'
-        attributes 'Agent-Class': 'src.AlphaRisk.java'
+        attributes 'Agent-Class': 'src.at.ac.tuwien.ifs.sge.agent.alpharisk.AlphaRisk'
         attributes 'Agent-Name': 'AlphaRisk'
     }
 }
@@ -33,5 +46,5 @@ sourceSets {
             srcDirs = ['src']
         }
     }
-    
+
 }

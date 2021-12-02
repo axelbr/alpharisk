@@ -4,7 +4,7 @@ import ai.djl.Device;
 import ai.djl.Model;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.MuZero;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.config.MuZeroConfig;
-import at.ac.tuwien.ifs.sge.agent.alpharisk.agent.fast.model.djl.blocks.atraining.MuZeroBlock;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.model.djl.blocks.atraining.MuZeroBlock;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 
@@ -15,8 +15,8 @@ import java.text.NumberFormat;
 import java.util.Map;
 import java.util.stream.IntStream;
 
-import static at.ac.tuwien.ifs.sge.agent.alpharisk.agent.fast.model.Network.getDoubleValue;
-import static at.ac.tuwien.ifs.sge.agent.alpharisk.agent.fast.model.Network.getEpoch;
+import static at.ac.tuwien.ifs.sge.agent.alpharisk.model.Network.getDoubleValue;
+import static at.ac.tuwien.ifs.sge.agent.alpharisk.model.Network.getEpoch;
 
 public class LossExtractor {
 

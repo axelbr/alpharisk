@@ -21,7 +21,7 @@ import ai.djl.Device;
 import ai.djl.Model;
 import ai.djl.nn.Block;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.config.MuZeroConfig;
-import at.ac.tuwien.ifs.sge.agent.alpharisk.agent.fast.model.djl.blocks.atraining.MuZeroBlock;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.model.djl.blocks.atraining.MuZeroBlock;
 import lombok.extern.slf4j.Slf4j;
 
 import java.nio.file.Paths;

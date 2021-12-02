@@ -11,9 +11,9 @@ import at.ac.tuwien.ifs.sge.game.risk.board.RiskAction;
 import at.ac.tuwien.ifs.sge.game.risk.board.Risk;
 import at.ac.tuwien.ifs.sge.agent.AbstractGameAgent;
 
-public class RiskAgent extends AbstractGameAgent<Risk, RiskAction> implements GameAgent<Risk, RiskAction>
+public class AlphaRisk extends AbstractGameAgent<Risk, RiskAction> implements GameAgent<Risk, RiskAction>
 {
-    public RiskAgent(final Logger log) {
+    public AlphaRisk(final Logger log) {
         super(0.75, 5L, TimeUnit.SECONDS, log);
     }
     

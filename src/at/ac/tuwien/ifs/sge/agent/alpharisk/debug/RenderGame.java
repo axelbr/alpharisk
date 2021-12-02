@@ -18,8 +18,8 @@
 package at.ac.tuwien.ifs.sge.agent.alpharisk.debug;
 
 import at.ac.tuwien.ifs.sge.agent.alpharisk.config.MuZeroConfig;
-import at.ac.tuwien.ifs.sge.agent.alpharisk.agent.gamebuffer.Game;
-import at.ac.tuwien.ifs.sge.agent.alpharisk.agent.slow.play.Action;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.gamebuffer.Game;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.play.Action;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
