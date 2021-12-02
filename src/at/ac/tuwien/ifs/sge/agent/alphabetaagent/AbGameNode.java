@@ -20,7 +20,7 @@ public class AbGameNode<A> implements GameNode<A>
     }
     
     public AbGameNode(final Game<A, ?> game, final A action, final double[] weights, final int absoluteDepth) {
-        this(game.doAction((Object)action), weights, absoluteDepth);
+        this(game.doAction(action), weights, absoluteDepth);
     }
     
     public AbGameNode(final Game<A, ?> game, final double[] weights, final int absoluteDepth) {

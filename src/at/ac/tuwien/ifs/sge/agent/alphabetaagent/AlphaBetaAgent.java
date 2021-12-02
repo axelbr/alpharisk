@@ -55,7 +55,7 @@ public class AlphaBetaAgent<G extends Game<A, ?>, A> extends AbstractGameAgent<G
     public void setUp(final int numberOfPlayers, final int playerId) {
         super.setUp(numberOfPlayers, playerId);
         this.abTree.clear();
-        this.abTree.setNode((Object)new AbGameNode());
+        this.abTree.setNode(new AbGameNode());
         this.averageBranchingCount = 0;
         this.averageBranching = 10.0;
         this.gameAbNodeUtilityComparator = Comparator.comparingDouble(AbGameNode::getUtility);

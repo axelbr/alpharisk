@@ -12,8 +12,8 @@ repositories {
 }
 
 dependencies {
-    compile group: 'at.ac.tuwien.ifs.sge', name: 'sge', version: '1.0.2'
-    compile group: 'at.ac.tuwien.ifs.sge', name: 'sge-risk', version: '1.0.2'
+    implementation group: 'at.ac.tuwien.ifs.sge', name: 'sge', version: '1.0.2'
+    implementation group: 'at.ac.tuwien.ifs.sge', name: 'sge-risk', version: '1.0.2'
     // https://mvnrepository.com/artifact/ai.djl/api
     implementation group: 'ai.djl', name: 'api', version: '0.14.0'
     //also consider to add the game in the same manner
@@ -25,4 +25,13 @@ jar {
         attributes 'Agent-Class': 'src.AlphaRisk.java'
         attributes 'Agent-Name': 'AlphaRisk'
     }
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src']
+        }
+    }
+    
 }
