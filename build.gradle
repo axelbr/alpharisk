@@ -16,9 +16,8 @@ dependencies {
     implementation group: 'at.ac.tuwien.ifs.sge', name: 'sge-risk', version: '1.0.2'
     // https://mvnrepository.com/artifact/ai.djl/api
     implementation group: 'ai.djl', name: 'api', version: '0.14.0'
-    // https://mvnrepository.com/artifact/org.projectlombok/lombok
-    compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.22'
-    compileOnly 'org.jetbrains:annotations:23.0.0'
+    // https://mvnrepository.com/artifact/org.jetbrains/annotations
+    implementation group: 'org.jetbrains', name: 'annotations', version: '23.0.0'
     // https://mvnrepository.com/artifact/org.apache.commons/commons-math3
     implementation group: 'org.apache.commons', name: 'commons-math3', version: '3.6.1'
     // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
@@ -30,6 +29,8 @@ dependencies {
     // https://mvnrepository.com/artifact/org.apache.commons/commons-csv
     implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.9.0'
 
+    compileOnly 'org.projectlombok:lombok:1.18.22'
+    annotationProcessor 'org.projectlombok:lombok:1.18.22'
 }
 
 jar {
