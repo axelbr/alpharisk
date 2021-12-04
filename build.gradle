@@ -28,6 +28,12 @@ dependencies {
     implementation group: 'ca.umontreal.iro.simul', name: 'ssj', version: '3.3.1'
     // https://mvnrepository.com/artifact/org.apache.commons/commons-csv
     implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.9.0'
+    // https://mvnrepository.com/artifact/org.slf4j/slf4j-api
+    implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.32'
+    // https://mvnrepository.com/artifact/org.slf4j/slf4j-simple
+    implementation group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.32'
+
+    implementation 'ai.djl.pytorch:pytorch-engine:0.14.0'
 
     compileOnly 'org.projectlombok:lombok:1.18.22'
     annotationProcessor 'org.projectlombok:lombok:1.18.22'
@@ -47,5 +53,4 @@ sourceSets {
             srcDirs = ['src']
         }
     }
-
 }
