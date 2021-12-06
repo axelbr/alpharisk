@@ -349,7 +349,7 @@ public class MCTS {
     public Action selectActionByMaxFromDistribution(List<Pair<Action, Double>> distributionInput) {
         Collections.shuffle(distributionInput);
         return distributionInput.stream()
-                .max((p1, p2) -> p1.getSecond().compareTo(p2.getSecond()))
+                .max(Comparator.comparing(Pair::getSecond))
                 .get().getKey();
     }
 }

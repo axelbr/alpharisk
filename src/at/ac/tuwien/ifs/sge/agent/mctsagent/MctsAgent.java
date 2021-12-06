@@ -51,7 +51,7 @@ public class MctsAgent<G extends Game<A, ?>, A> extends AbstractGameAgent<G, A> 
     public void setUp(final int numberOfPlayers, final int playerId) {
         super.setUp(numberOfPlayers, playerId);
         this.mcTree.clear();
-        this.mcTree.setNode(new McGameNode());
+        this.mcTree.setNode(new McGameNode<>());
         this.gameMcTreeUCTComparator =
             Comparator.comparingDouble(t -> this.upperConfidenceBound(t, this.exploitationConstant));
         this.gameMcNodePlayComparator = Comparator.comparingInt(McGameNode::getPlays);
@@ -78,7 +78,7 @@ public class MctsAgent<G extends Game<A, ?>, A> extends AbstractGameAgent<G, A> 
     public A computeNextAction(final G game, final long computationTime, final TimeUnit timeUnit) {
         super.setTimers(computationTime, timeUnit);
         this.log.tra_("Searching for root of tree");
-        final boolean foundRoot = Util.findRoot((Tree) this.mcTree, (Game) game);
+        final boolean foundRoot = Util.findRoot(this.mcTree, game);
         if (foundRoot) {
             this.log._trace(", done.");
         } else {
@@ -87,7 +87,7 @@ public class MctsAgent<G extends Game<A, ?>, A> extends AbstractGameAgent<G, A> 
         this.log.tra_("Check if best move will eventually end game: ");
         if (this.sortPromisingCandidates(this.mcTree, this.gameMcNodeMoveComparator.reversed())) {
             this.log._trace("Yes");
-            return (A) ((McGameNode) Collections.max(this.mcTree.getChildren(), this.gameMcTreeMoveComparator)
+            return (Collections.max(this.mcTree.getChildren(), this.gameMcTreeMoveComparator)
                 .getNode()).getGame().getPreviousAction();
         }
         this.log._trace("No");
@@ -131,7 +131,7 @@ public class MctsAgent<G extends Game<A, ?>, A> extends AbstractGameAgent<G, A> 
             return Collections.max((Collection<? extends A>) game.getPossibleActions(),
                                    (o1, o2) -> this.gameComparator.compare(game.doAction(o1), game.doAction(o2)));
         }
-        return (A) ((McGameNode) Collections.max(this.mcTree.getChildren(), this.gameMcTreeMoveComparator).getNode())
+        return (Collections.max(this.mcTree.getChildren(), this.gameMcTreeMoveComparator).getNode())
             .getGame().getPreviousAction();
     }
 
@@ -139,14 +139,14 @@ public class MctsAgent<G extends Game<A, ?>, A> extends AbstractGameAgent<G, A> 
         boolean isDetermined;
         for (isDetermined = true; !tree.isLeaf() && isDetermined; tree = tree.getChild(0)) {
             isDetermined =
-                tree.getChildren().stream().allMatch(c -> ((McGameNode) c.getNode()).getGame().getCurrentPlayer() >= 0);
-            if (((McGameNode) tree.getNode()).getGame().getCurrentPlayer() == this.playerId) {
+                tree.getChildren().stream().allMatch(c -> (c.getNode()).getGame().getCurrentPlayer() >= 0);
+            if (( tree.getNode()).getGame().getCurrentPlayer() == this.playerId) {
                 tree.sort(comparator);
             } else {
                 tree.sort(comparator.reversed());
             }
         }
-        return isDetermined && ((McGameNode) tree.getNode()).getGame().isGameOver();
+        return isDetermined && (tree.getNode()).getGame().isGameOver();
     }
 
     private Tree<McGameNode<A>> mcSelection(Tree<McGameNode<A>> tree) {

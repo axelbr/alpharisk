@@ -53,7 +53,7 @@ public class ReplayBuffer {
         this.buffer = new ReplayBufferDTO(config.getWindowSize());
     }
 
-    public static @NotNull Sample sampleFromGame(int numUnrollSteps, int tdSteps, @NotNull Game game, NDManager ndManager, ReplayBuffer replayBuffer, MuZeroConfig config) {
+    public static @NotNull Sample sampleFromGame(int numUnrollSteps, int tdSteps, @NotNull MuZeroGame game, NDManager ndManager, ReplayBuffer replayBuffer, MuZeroConfig config) {
         int gamePos = samplePosition(game);
         if (gamePos == 0) {
             int i = 42;
@@ -62,7 +62,7 @@ public class ReplayBuffer {
     }
 
 
-    public static @NotNull Sample sampleFromGame(int numUnrollSteps, int tdSteps, @NotNull Game game, int gamePos, NDManager ndManager, ReplayBuffer replayBuffer, MuZeroConfig config) {
+    public static @NotNull Sample sampleFromGame(int numUnrollSteps, int tdSteps, @NotNull MuZeroGame game, int gamePos, NDManager ndManager, ReplayBuffer replayBuffer, MuZeroConfig config) {
         Sample sample = new Sample();
         game.replayToPosition(gamePos);
 
@@ -91,7 +91,7 @@ public class ReplayBuffer {
 //    }
 
 
-    public static int samplePosition(@NotNull Game game) {
+    public static int samplePosition(@NotNull MuZeroGame game) {
         int numActions = game.getGameDTO().getActionHistory().size();
         return ThreadLocalRandom.current().nextInt(0, numActions + 1);  // one more positions than actions
     }
@@ -122,7 +122,7 @@ public class ReplayBuffer {
     }
 
 
-    public void saveGame(@NotNull Game game) {
+    public void saveGame(@NotNull MuZeroGame game) {
 
 
         buffer.saveGame(game, config);
@@ -142,15 +142,15 @@ public class ReplayBuffer {
 
 
     // for "fair" training do train the strengths of PlayerA and PlayerB equally
-    public List<Game> sampleGames() {
+    public List<MuZeroGame> sampleGames() {
 
 //        long start = System.currentTimeMillis();
 
-        List<Game> games = new ArrayList<>(this.buffer.getGames());
+        List<MuZeroGame> games = new ArrayList<>(this.buffer.getGames());
         Collections.shuffle(games);
 
 
-        List<Game> gamesToTrain = new ArrayList<>();
+        List<MuZeroGame> gamesToTrain = new ArrayList<>();
         gamesToTrain.addAll(games.stream()
                 .filter(g -> {
                     if (g instanceof ZeroSumGame) {
@@ -217,7 +217,7 @@ public class ReplayBuffer {
     public void rebuildGames() {
         buffer.games = new ArrayList<>();
         for (GameDTO gameDTO : buffer.getData()) {
-            Game game = this.config.newGame();
+            MuZeroGame game = this.config.newGame();
             game.setGameDTO(gameDTO);
             if (!game.terminal()) {
                 game.replayToPosition(game.actionHistory().getActionIndexList().size());

@@ -35,7 +35,7 @@ public class ReplayBufferDTO implements Serializable {
 
     final List<GameDTO> data = new ArrayList<>();
     //  transient GameTree gameTree;
-    transient List<Game> games = new ArrayList<>();
+    transient List<MuZeroGame> games = new ArrayList<>();
     private long counter;
     private int windowSize;
 
@@ -47,11 +47,11 @@ public class ReplayBufferDTO implements Serializable {
         this.windowSize = windowSize;
     }
 
-    public void saveGame(@NotNull Game game, MuZeroConfig config) {
+    public void saveGame(@NotNull MuZeroGame game, MuZeroConfig config) {
         //  System.out.println(game.actionHistory().getActionIndexList());
         while (isBufferFilled()) {
             GameDTO toberemoved = data.get(0);
-            Game gameToberemoved = config.newGame();
+            MuZeroGame gameToberemoved = config.newGame();
             gameToberemoved.setGameDTO(toberemoved);
             games.remove(gameToberemoved);
             data.remove(0);

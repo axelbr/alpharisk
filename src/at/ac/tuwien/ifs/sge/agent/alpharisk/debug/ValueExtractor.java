@@ -18,7 +18,7 @@
 package at.ac.tuwien.ifs.sge.agent.alpharisk.debug;
 
 import at.ac.tuwien.ifs.sge.agent.alpharisk.config.MuZeroConfig;
-import at.ac.tuwien.ifs.sge.agent.alpharisk.gamebuffer.Game;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.gamebuffer.MuZeroGame;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.gamebuffer.ReplayBuffer;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.config.PlayerMode;
 import lombok.extern.slf4j.Slf4j;
@@ -83,7 +83,7 @@ public class ValueExtractor {
         // replayBuffer.getBuffer().getGames().forEach(g -> System.out.println(g.actionHistory().getActionIndexList()));
 
 
-        Game game = replayBuffer.getBuffer().getGames().get(replayBuffer.getBuffer().getGames().size() - 1);
+        MuZeroGame game = replayBuffer.getBuffer().getGames().get(replayBuffer.getBuffer().getGames().size() - 1);
 
         List<Integer> actions = game.actionHistory().getActionIndexList();
         System.out.println(actions);

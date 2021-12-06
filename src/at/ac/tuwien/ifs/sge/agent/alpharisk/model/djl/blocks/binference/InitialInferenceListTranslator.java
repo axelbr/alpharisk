@@ -28,7 +28,7 @@ import ai.djl.translate.TranslatorContext;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.model.NetworkIO;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.model.Observation;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.model.djl.SubModel;
-import at.ac.tuwien.ifs.sge.agent.alpharisk.gamebuffer.Game;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.gamebuffer.MuZeroGame;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -39,7 +39,7 @@ import java.util.stream.IntStream;
 
 import static at.ac.tuwien.ifs.sge.agent.alpharisk.config.MuZeroConfig.hiddenStateRemainOnGPU;
 
-public class InitialInferenceListTranslator implements Translator<List<Game>, List<NetworkIO>> {
+public class InitialInferenceListTranslator implements Translator<List<MuZeroGame>, List<NetworkIO>> {
     @Override
     public @Nullable Batchifier getBatchifier() {
         return null;
@@ -107,7 +107,7 @@ public class InitialInferenceListTranslator implements Translator<List<Game>, Li
     }
 
     @Override
-    public @NotNull NDList processInput(@NotNull TranslatorContext ctx, @NotNull List<Game> gameList) {
+    public @NotNull NDList processInput(@NotNull TranslatorContext ctx, @NotNull List<MuZeroGame> gameList) {
         List<Observation> observations = gameList.stream()
                 .map(g -> g.getObservation(ctx.getNDManager()))
                 .collect(Collectors.toList());

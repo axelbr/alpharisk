@@ -21,7 +21,7 @@ import ai.djl.ndarray.NDManager;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.config.MuZeroConfig;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.model.Network;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.model.NetworkIO;
-import at.ac.tuwien.ifs.sge.agent.alpharisk.gamebuffer.Game;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.gamebuffer.MuZeroGame;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.play.Action;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.play.MCTS;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.play.MinMaxStats;
@@ -47,7 +47,7 @@ public class Inference {
         int actionIndexSelectedByNetwork;
         config.setNetworkBaseDir(networkDir);
         config.setInferenceDevice(Device.cpu());
-        Game game = getGame(config, actions);
+        MuZeroGame game = getGame(config, actions);
 
 
         try (Model model = Model.newInstance(config.getModelName(), config.getInferenceDevice())) {
@@ -72,7 +72,7 @@ public class Inference {
         double valueByNetwork;
         config.setNetworkBaseDir(networkDir);
         config.setInferenceDevice(Device.cpu());
-        Game game = getGame(config, actions);
+        MuZeroGame game = getGame(config, actions);
 
 
         try (Model model = Model.newInstance(config.getModelName(), config.getInferenceDevice())) {
@@ -92,14 +92,14 @@ public class Inference {
     }
 
 
-    public static Game getGame(MuZeroConfig config, List<Integer> actions) {
-        Game game = config.newGame();
+    public static MuZeroGame getGame(MuZeroConfig config, List<Integer> actions) {
+        MuZeroGame game = config.newGame();
         actions.stream().forEach(a -> game.apply( config.newAction(a)));
         return game;
     }
 
 
-    private static Pair<Double, Integer> aiDecision(@NotNull Network network, boolean withMCTS, Game game) {
+    public static Pair<Double, Integer> aiDecision(@NotNull Network network, boolean withMCTS, MuZeroGame game) {
         NetworkIO networkOutput = network.initialInferenceDirect(game);
         double aiValue = networkOutput.getValue();
         int actionIndexSelectedByNetwork = -1;
@@ -118,7 +118,7 @@ public class Inference {
                             .mapToObj(i -> {
                                 Action action = game.getConfig().newAction(i);
                                 double v = policyValues[i];
-                                return new Pair<Action, Double>(action, v);
+                                return new Pair<>(action, v);
                             }).collect(Collectors.toList());
 
             Action action = mcts.selectActionByMaxFromDistribution(distributionInput);
@@ -127,9 +127,7 @@ public class Inference {
         } else {
             Node root = new Node(network.getConfig(), 0);
 
-
             mcts.expandNode(root, game.toPlay(), legalActions, networkOutput, false, network.getConfig());
-
             MinMaxStats minMaxStats = mcts.run(root, game.actionHistory(), network, null);
             Action action = mcts.selectActionByMax(root, minMaxStats);
             actionIndexSelectedByNetwork = action.getIndex();

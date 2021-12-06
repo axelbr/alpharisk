@@ -22,7 +22,7 @@ import ai.djl.ndarray.NDManager;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.config.MuZeroConfig;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.model.Network;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.model.NetworkIO;
-import at.ac.tuwien.ifs.sge.agent.alpharisk.gamebuffer.Game;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.gamebuffer.MuZeroGame;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -45,20 +45,20 @@ public class SelfPlayParallel {
     private final @Nullable DirichletGen dg = null;
 
 
-    public static @NotNull List<Game> playGame(@NotNull MuZeroConfig config, Network network, boolean render, boolean fastRuleLearning,  boolean explorationNoise) {
+    public static @NotNull List<MuZeroGame> playGame(@NotNull MuZeroConfig config, Network network, boolean render, boolean fastRuleLearning, boolean explorationNoise) {
         long start = System.currentTimeMillis();
         Duration inferenceDuration = new Duration();
         network.debugDump();
-        List<Game> gameList = IntStream.rangeClosed(1, config.getNumParallelPlays())
+        List<MuZeroGame> gameList = IntStream.rangeClosed(1, config.getNumParallelPlays())
                 .mapToObj(i -> config.newGame())
                 .collect(Collectors.toList());
 
 
-        List<Game> gamesDoneList = new ArrayList<>();
+        List<MuZeroGame> gamesDoneList = new ArrayList<>();
 
         MCTS mcts = new MCTS(config);
 
-        Game justOneOfTheGames = gameList.get(0);
+        MuZeroGame justOneOfTheGames = gameList.get(0);
 
 
         if (render) {
@@ -124,13 +124,13 @@ public class SelfPlayParallel {
                 List<MinMaxStats> minMaxStatsList = null;
                 if (!fastRuleLearning) {
                     minMaxStatsList = mcts.runParallel(rootList,
-                            gameList.stream().map(Game::actionHistory).collect(Collectors.toList()),
+                            gameList.stream().map(MuZeroGame::actionHistory).collect(Collectors.toList()),
                             network, inferenceDuration, config.getNumSimulations());
                 }
 
 
                 for (int g = 0; g < gameList.size(); g++) {
-                    Game game = gameList.get(g);
+                    MuZeroGame game = gameList.get(g);
                     Node root = rootList.get(g);
                     Action action = null;
 
@@ -153,7 +153,7 @@ public class SelfPlayParallel {
 
                 }
 
-                List<Game> newGameDoneList = gameList.stream()
+                List<MuZeroGame> newGameDoneList = gameList.stream()
                         .filter(game -> game.terminal() || game.getGameDTO().getActionHistory().size() >= config.getMaxMoves())
                         .collect(Collectors.toList());
 

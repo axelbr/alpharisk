@@ -34,7 +34,7 @@ import at.ac.tuwien.ifs.sge.agent.alpharisk.model.djl.blocks.binference.Recurren
 import at.ac.tuwien.ifs.sge.agent.alpharisk.model.djl.blocks.cmainfunctions.DynamicsBlock;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.model.djl.blocks.cmainfunctions.PredictionBlock;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.model.djl.blocks.cmainfunctions.RepresentationBlock;
-import at.ac.tuwien.ifs.sge.agent.alpharisk.gamebuffer.Game;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.gamebuffer.MuZeroGame;
 import lombok.Data;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -143,17 +143,17 @@ public class Network {
     }
 
 
-    public NetworkIO initialInferenceDirect(@NotNull Game game) {
+    public NetworkIO initialInferenceDirect(@NotNull MuZeroGame game) {
         return Objects.requireNonNull(initialInferenceListDirect(List.of(game))).get(0);
     }
 
 
-    public @Nullable List<NetworkIO> initialInferenceListDirect(List<Game> gameList) {
+    public @Nullable List<NetworkIO> initialInferenceListDirect(List<MuZeroGame> gameList) {
 
         List<NetworkIO> networkOutputFromInitialInference = null;
 
         InitialInferenceListTranslator translator = new InitialInferenceListTranslator();
-        try (Predictor<List<Game>, List<NetworkIO>> predictor = initialInference.newPredictor(translator)) {
+        try (Predictor<List<MuZeroGame>, List<NetworkIO>> predictor = initialInference.newPredictor(translator)) {
             networkOutputFromInitialInference = predictor.predict(gameList);
 
         } catch (TranslateException e) {

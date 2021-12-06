@@ -22,7 +22,7 @@ import ai.djl.ndarray.NDManager;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.MuZero;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.config.MuZeroConfig;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.model.Network;
-import at.ac.tuwien.ifs.sge.agent.alpharisk.gamebuffer.Game;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.gamebuffer.MuZeroGame;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.gamebuffer.GameIO;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.gamebuffer.ReplayBuffer;
 import lombok.extern.slf4j.Slf4j;
@@ -45,7 +45,7 @@ public class PlayManager {
 
         for (int i = 0; i < config.getNumPlays(); i++) {
 
-            List<Game> gameList = SelfPlayParallel.playGame(config, network, render, fastRuleLearning,  explorationNoise);
+            List<MuZeroGame> gameList = SelfPlayParallel.playGame(config, network, render, fastRuleLearning, explorationNoise);
             gameList.forEach(replayBuffer::saveGame);
 
             log.info("Played {} games parallel, round {}", config.getNumParallelPlays(), i);
@@ -59,7 +59,7 @@ public class PlayManager {
     }
 
 
-    private static void saveGame(@NotNull ReplayBuffer replayBuffer, @NotNull Game game, @NotNull MuZeroConfig config, boolean persistPerGame) {
+    private static void saveGame(@NotNull ReplayBuffer replayBuffer, @NotNull MuZeroGame game, @NotNull MuZeroConfig config, boolean persistPerGame) {
 
         replayBuffer.saveGame(game);
 

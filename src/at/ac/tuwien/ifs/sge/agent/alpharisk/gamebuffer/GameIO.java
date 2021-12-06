@@ -38,20 +38,20 @@ import static at.ac.tuwien.ifs.sge.agent.alpharisk.MuZero.getNetworksBasedir;
 public class GameIO {
     private static int latestGameNo = -1;
 
-    public static List<Game> readGames(@NotNull MuZeroConfig config) {
+    public static List<MuZeroGame> readGames(@NotNull MuZeroConfig config) {
         try (Stream<Path> walk = Files.walk(Paths.get(getGamesBasedir(config)))) {
             return walk.filter(path -> !path.toString().endsWith("games") && !path.toString().contains("buffer"))
                     // .limit(3000)
-                    .map(path -> Game.decode(config, loadPathAsByteArray(path)))
+                    .map(path -> MuZeroGame.decode(config, loadPathAsByteArray(path)))
                     .collect(Collectors.toList());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public static @NotNull Game readGame(int i, @NotNull MuZeroConfig config) {
+    public static @NotNull MuZeroGame readGame(int i, @NotNull MuZeroConfig config) {
         try {
-            return Game.decode(config, Files.readAllBytes(Paths.get(getGamesBasedir(config) + "/game" + i)));
+            return MuZeroGame.decode(config, Files.readAllBytes(Paths.get(getGamesBasedir(config) + "/game" + i)));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

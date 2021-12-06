@@ -19,7 +19,7 @@ package at.ac.tuwien.ifs.sge.agent.alpharisk.config;
 
 import ai.djl.Device;
 import ai.djl.ndarray.NDArray;
-import at.ac.tuwien.ifs.sge.agent.alpharisk.gamebuffer.Game;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.gamebuffer.MuZeroGame;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.play.Action;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.play.KnownBounds;
 import lombok.Builder;
@@ -91,10 +91,10 @@ public class MuZeroConfig {
     private String networkBaseDir;
     private int numberTrainingStepsOnRandomPlay;
 
-    public Game newGame() {
+    public MuZeroGame newGame() {
         try {
             Constructor<?> constructor = gameClass.getConstructor(MuZeroConfig.class);
-            return (Game) constructor.newInstance(this);
+            return (MuZeroGame) constructor.newInstance(this);
         } catch (Exception e) {
             e.printStackTrace();
         }

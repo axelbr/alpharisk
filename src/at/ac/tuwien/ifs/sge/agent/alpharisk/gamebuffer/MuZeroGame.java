@@ -25,6 +25,10 @@ import at.ac.tuwien.ifs.sge.agent.alpharisk.model.Sample;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.play.*;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.environment.Environment;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.environment.OneOfTwoPlayer;
+import at.ac.tuwien.ifs.sge.game.Game;
+import at.ac.tuwien.ifs.sge.game.risk.board.Risk;
+import at.ac.tuwien.ifs.sge.game.risk.board.RiskAction;
+import at.ac.tuwien.ifs.sge.game.risk.board.RiskBoard;
 import lombok.Data;
 import org.apache.commons.math3.util.Pair;
 import org.jetbrains.annotations.NotNull;
@@ -37,7 +41,7 @@ import java.util.*;
  * A single episode of interaction with the environment.
  */
 @Data
-public abstract class Game implements Serializable {
+public abstract class MuZeroGame implements Serializable {
 
     protected boolean purelyRandom;
 
@@ -50,25 +54,25 @@ public abstract class Game implements Serializable {
     protected Environment environment;
 
 
-    public Game(@NotNull MuZeroConfig config) {
+    public MuZeroGame(@NotNull MuZeroConfig config) {
         this.config = config;
         this.gameDTO = new GameDTO(this);
         this.actionSpaceSize = config.getActionSpaceSize();
         this.discount = config.getDiscount();
     }
 
-    public Game(@NotNull MuZeroConfig config, GameDTO gameDTO) {
+    public MuZeroGame(@NotNull MuZeroConfig config, GameDTO gameDTO) {
         this.config = config;
         this.gameDTO = gameDTO;
         this.actionSpaceSize = config.getActionSpaceSize();
         this.discount = config.getDiscount();
     }
 
-    public static Game decode(@NotNull MuZeroConfig config, byte @NotNull [] bytes) {
+    public static MuZeroGame decode(@NotNull MuZeroConfig config, byte @NotNull [] bytes) {
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bytes);
         try (ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream)) {
             GameDTO dto = (GameDTO) objectInputStream.readObject();
-            Game game = config.newGame();
+            MuZeroGame game = config.newGame();
             Objects.requireNonNull(game).setGameDTO(dto);
             return game;
         } catch (Exception e) {
@@ -76,8 +80,8 @@ public abstract class Game implements Serializable {
         }
     }
 
-    public @NotNull Game clone() {
-        Game clone = decode(this.config, this.encode());
+    public @NotNull MuZeroGame clone() {
+        MuZeroGame clone = decode(this.config, this.encode());
         clone.replayToPosition(clone.getGameDTO().getActionHistory().size());
         return clone;
     }
@@ -359,8 +363,8 @@ public abstract class Game implements Serializable {
 
 
     public boolean equals(Object other) {
-        if (!(other instanceof Game)) return false;
-        Game otherGame = (Game) other;
+        if (!(other instanceof MuZeroGame)) return false;
+        MuZeroGame otherGame = (MuZeroGame) other;
         return this.getGameDTO().getActionHistory().equals(otherGame.getGameDTO().getActionHistory());
     }
 

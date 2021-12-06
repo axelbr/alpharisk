@@ -27,7 +27,7 @@ public class AlphaRisk extends AbstractGameAgent<Risk, RiskAction> implements Ga
         List<Integer> actions = new ArrayList<>();
         final int nextMoveInt =
             Inference.aiDecision(actions, true, "./pretrained", RiskConfigFactory.getRiskInstance());
-        return game.getPossibleActions()[nextMoveInt];
+        return (RiskAction) game.getPossibleActions().toArray()[nextMoveInt];
     }
 
     public void tearDown() {

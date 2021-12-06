@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
 
-public abstract class ZeroSumGame extends Game{
+public abstract class ZeroSumGame extends MuZeroGame {
     public ZeroSumGame(@NotNull MuZeroConfig config) {
         super(config);
     }

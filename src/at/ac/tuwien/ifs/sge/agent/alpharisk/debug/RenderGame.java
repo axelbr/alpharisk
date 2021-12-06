@@ -18,7 +18,7 @@
 package at.ac.tuwien.ifs.sge.agent.alpharisk.debug;
 
 import at.ac.tuwien.ifs.sge.agent.alpharisk.config.MuZeroConfig;
-import at.ac.tuwien.ifs.sge.agent.alpharisk.gamebuffer.Game;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.gamebuffer.MuZeroGame;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.play.Action;
 import org.jetbrains.annotations.NotNull;
 
@@ -27,14 +27,14 @@ import java.util.Objects;
 public class RenderGame {
 
 
-    public static void applyAction(@NotNull Game game, int a) {
+    public static void applyAction(@NotNull MuZeroGame game, int a) {
         game.apply(a);
 
         System.out.println("action=" + a + ", terminal=" + game.terminal() + ", " + game.legalActions() + ", lastreward=" + game.getLastReward());
     }
 
-    public static void renderGame(@NotNull MuZeroConfig config, @NotNull Game game) {
-        Game replayGame = config.newGame();
+    public static void renderGame(@NotNull MuZeroConfig config, @NotNull MuZeroGame game) {
+        MuZeroGame replayGame = config.newGame();
 
         System.out.println("\n" + Objects.requireNonNull(replayGame).render());
         for (int i = 0; i < game.getGameDTO().getActionHistory().size(); i++) {

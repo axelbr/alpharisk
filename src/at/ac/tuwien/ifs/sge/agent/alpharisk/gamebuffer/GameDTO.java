@@ -44,7 +44,7 @@ public class GameDTO implements Serializable {
 
     //transient OneOfTwoPlayer winner;
 
-    public GameDTO(@NotNull Game game) {
+    public GameDTO(@NotNull MuZeroGame game) {
         this.gameClassName = game.getClass().getCanonicalName();
         this.actionHistory = new ArrayList<>();
         this.rewards = new ArrayList<>();
