@@ -10,6 +10,13 @@ java {
     withSourcesJar()
 }
 
+sourcesJar {
+    exclude("at/ac/tuwien/ifs/sge/agent/alphabetaagent")
+    exclude("at/ac/tuwien/ifs/sge/agent/mctsagent")
+    exclude("at/ac/tuwien/ifs/sge/agent/randomagent")
+    exclude("at/ac/tuwien/ifs/sge/agent/risk")
+}
+
 repositories {
     mavenCentral()
     jcenter()
@@ -59,12 +66,16 @@ task uberJar(type: Jar) {
 
     duplicatesStrategy = 'WARN'
 
-    from sourceSets.main.output
-
+    from sourceSets.main.allSource
     dependsOn configurations.runtimeClasspath
     from {
         configurations.runtimeClasspath.findAll { it.name }.collect { zipTree(it) }
     }
+
+    exclude("at/ac/tuwien/ifs/sge/agent/alphabetaagent")
+    exclude("at/ac/tuwien/ifs/sge/agent/mctsagent")
+    exclude("at/ac/tuwien/ifs/sge/agent/randomagent")
+    exclude("at/ac/tuwien/ifs/sge/agent/risk")
 }
 
 shadowJar {
@@ -73,6 +84,11 @@ shadowJar {
                 'Agent-Class': 'at.ac.tuwien.ifs.sge.agent.alpharisk.AlphaRisk',
                 'Agent-Name': 'AlphaRisk')
     }
+
+    exclude("at/ac/tuwien/ifs/sge/agent/alphabetaagent")
+    exclude("at/ac/tuwien/ifs/sge/agent/mctsagent")
+    exclude("at/ac/tuwien/ifs/sge/agent/randomagent")
+    exclude("at/ac/tuwien/ifs/sge/agent/risk")
     minimize()
 }
 
