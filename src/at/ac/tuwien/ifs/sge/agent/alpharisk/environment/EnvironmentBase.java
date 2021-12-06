@@ -19,7 +19,7 @@ package at.ac.tuwien.ifs.sge.agent.alpharisk.environment;
 
 
 import at.ac.tuwien.ifs.sge.agent.alpharisk.config.MuZeroConfig;
-import at.ac.tuwien.ifs.sge.agent.alpharisk.play.Action;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.play.MuZeroAction;
 import lombok.Data;
 import org.apache.commons.lang3.NotImplementedException;
 import org.jetbrains.annotations.NotNull;
@@ -85,7 +85,7 @@ public class EnvironmentBase implements Environment, Serializable {
 
     }
 
-    public float step(Action action) {
+    public float step(MuZeroAction action) {
         throw new NotImplementedException("step() not implemented, yet.");
     }
 
@@ -100,12 +100,12 @@ public class EnvironmentBase implements Environment, Serializable {
     }
 
     @Override
-    public @NotNull List<Action> legalActions() {
+    public @NotNull List<MuZeroAction> legalActions() {
         throw new NotImplementedException("legalActions() not implemented, yet.");
     }
 
     @Override
-    public @NotNull List<Action> allActionsInActionSpace() {
+    public @NotNull List<MuZeroAction> allActionsInActionSpace() {
         throw new NotImplementedException("allActionsInActionSpace() not implemented, yet.");
     }
 

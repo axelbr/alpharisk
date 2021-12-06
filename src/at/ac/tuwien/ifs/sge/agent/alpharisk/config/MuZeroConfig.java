@@ -20,7 +20,7 @@ package at.ac.tuwien.ifs.sge.agent.alpharisk.config;
 import ai.djl.Device;
 import ai.djl.ndarray.NDArray;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.gamebuffer.MuZeroGame;
-import at.ac.tuwien.ifs.sge.agent.alpharisk.play.Action;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.play.MuZeroAction;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.play.KnownBounds;
 import lombok.Builder;
 import lombok.Data;
@@ -100,15 +100,15 @@ public class MuZeroConfig {
         }
         return null;
     }
-    public Action newAction(int index) {
-        Action action = this.newAction();
+    public MuZeroAction newAction(int index) {
+        MuZeroAction action = this.newAction();
         action.setIndex(index);
         return action;
     }
-    public Action newAction() {
+    public MuZeroAction newAction() {
         try {
             Constructor<?> constructor = actionClass.getConstructor(MuZeroConfig.class);
-            return (Action) constructor.newInstance(this);
+            return (MuZeroAction) constructor.newInstance(this);
         } catch (Exception e) {
             e.printStackTrace();
         }

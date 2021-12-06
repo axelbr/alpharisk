@@ -132,7 +132,7 @@ public class SelfPlayParallel {
                 for (int g = 0; g < gameList.size(); g++) {
                     MuZeroGame game = gameList.get(g);
                     Node root = rootList.get(g);
-                    Action action = null;
+                    MuZeroAction action = null;
 
                     if (fastRuleLearning) {
                         action = getRandomAction(root, config);
@@ -178,10 +178,10 @@ public class SelfPlayParallel {
     }
 
 
-    private static Action getRandomAction(Node root, MuZeroConfig config) {
-        SortedMap<Action, Node> children = root.getChildren();
+    private static MuZeroAction getRandomAction(Node root, MuZeroConfig config) {
+        SortedMap<MuZeroAction, Node> children = root.getChildren();
         int index = randomStreamBase.nextInt(0, children.size() - 1);
-        return ((Map.Entry<Action, Node>) children.entrySet().toArray()[index]).getKey();
+        return ((Map.Entry<MuZeroAction, Node>) children.entrySet().toArray()[index]).getKey();
     }
 
 
@@ -192,10 +192,10 @@ public class SelfPlayParallel {
 
 
     public static void addExplorationNoise(double rootExplorationFraction, double rootDirichletAlpha, @NotNull Node node) {
-        Action[] actions = node.getChildren().keySet().toArray(new Action[0]);
+        MuZeroAction[] actions = node.getChildren().keySet().toArray(new MuZeroAction[0]);
         double[] noise = numpyRandomDirichlet(rootDirichletAlpha, actions.length);
         for (int i = 0; i < actions.length; i++) {
-            Action action = actions[i];
+            MuZeroAction action = actions[i];
             Node child = node.getChildren().get(action);
             child.prior = (1 - rootExplorationFraction) * child.prior + rootExplorationFraction * noise[i];
         }

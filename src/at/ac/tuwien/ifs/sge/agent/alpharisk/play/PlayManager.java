@@ -54,7 +54,7 @@ public class PlayManager {
     }
 
     public static List<NDArray> getAllActionsOnDevice(@NotNull MuZeroConfig config, @NotNull NDManager ndManager) {
-        List<Action> actions = Objects.requireNonNull(config.newGame()).allActionsInActionSpace();
+        List<MuZeroAction> actions = Objects.requireNonNull(config.newGame()).allActionsInActionSpace();
         return actions.stream().map(action -> action.encode(ndManager)).collect(Collectors.toList());
     }
 

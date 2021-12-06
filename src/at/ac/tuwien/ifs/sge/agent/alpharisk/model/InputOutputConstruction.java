@@ -26,7 +26,7 @@ import ai.djl.ndarray.index.NDIndex;
 import ai.djl.ndarray.types.Shape;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.config.MuZeroConfig;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.gamebuffer.Target;
-import at.ac.tuwien.ifs.sge.agent.alpharisk.play.Action;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.play.MuZeroAction;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 
@@ -150,10 +150,10 @@ public class InputOutputConstruction {
                 //  System.out.println("k: " + k + ", b: " + b++);
                 NDArray aArray;
                 if (s.getActionsList().size() > k) {
-                    Action action = config.newAction(s.getActionsList().get(k));
+                    MuZeroAction action = config.newAction(s.getActionsList().get(k));
                     aArray = action.encode(nd);
                 } else {
-                    aArray = Action.encodeEmptyNDArray(config, nd);
+                    aArray = MuZeroAction.encodeEmptyNDArray(config, nd);
                 }
                 list.add(aArray);
             }

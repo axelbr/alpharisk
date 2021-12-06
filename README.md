@@ -1,6 +1,6 @@
 # alpharisk
 
-Agent currently not functional!
+GameAgent for [SGE Risk](https://gitlab.com/StrategyGameEngine/sge-risk). Agent currently not functional!
 
 This game agent is based on the muzero java implementation found on Github: https://github.com/enpasos/muzero
 

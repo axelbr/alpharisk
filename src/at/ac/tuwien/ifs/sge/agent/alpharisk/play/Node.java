@@ -32,9 +32,9 @@ public class Node {
     public double prior;
     public double multiplierLambda;
     public double valueSum;
-    public SortedMap<Action, Node> children;
+    public SortedMap<MuZeroAction, Node> children;
     public @Nullable NDArray hiddenState;
-    public Action action;
+    public MuZeroAction action;
     public double reward;
     private int visitCount;
     private boolean root = false;

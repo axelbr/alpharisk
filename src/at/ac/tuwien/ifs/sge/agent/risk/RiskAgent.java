@@ -1,15 +1,14 @@
 package at.ac.tuwien.ifs.sge.agent.risk;
 
-import at.ac.tuwien.ifs.sge.game.Game;
-import java.util.Iterator;
-import java.util.Set;
-import at.ac.tuwien.ifs.sge.game.risk.board.RiskBoard;
-import java.util.concurrent.TimeUnit;
-import at.ac.tuwien.ifs.sge.engine.Logger;
-import at.ac.tuwien.ifs.sge.agent.GameAgent;
-import at.ac.tuwien.ifs.sge.game.risk.board.RiskAction;
-import at.ac.tuwien.ifs.sge.game.risk.board.Risk;
 import at.ac.tuwien.ifs.sge.agent.AbstractGameAgent;
+import at.ac.tuwien.ifs.sge.agent.GameAgent;
+import at.ac.tuwien.ifs.sge.engine.Logger;
+import at.ac.tuwien.ifs.sge.game.risk.board.Risk;
+import at.ac.tuwien.ifs.sge.game.risk.board.RiskAction;
+import at.ac.tuwien.ifs.sge.game.risk.board.RiskBoard;
+
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 public class RiskAgent extends AbstractGameAgent<Risk, RiskAction> implements GameAgent<Risk, RiskAction>
 {
@@ -28,9 +27,9 @@ public class RiskAgent extends AbstractGameAgent<Risk, RiskAction> implements Ga
         this.shouldStopComputation();
         final RiskBoard board = game.getBoard();
         board.getNrOfTerritoriesOccupiedByPlayer(this.playerId);
-        game.getHeuristicValue(new double[0]);
+        game.getHeuristicValue();
         game.getHeuristicValue(this.playerId);
-        final Set<RiskAction> possibleActions = (Set<RiskAction>)game.getPossibleActions();
+        final Set<RiskAction> possibleActions = game.getPossibleActions();
         double bestUtilityValue = Double.NEGATIVE_INFINITY;
         double bestHeuristicValue = Double.NEGATIVE_INFINITY;
         RiskAction bestAction = null;
@@ -46,7 +45,7 @@ public class RiskAgent extends AbstractGameAgent<Risk, RiskAction> implements Ga
         }
         assert bestAction != null;
         assert game.isValidAction(bestAction);
-        this.log.debugf("Found best move: %s", new Object[] { bestAction.toString() });
+        this.log.debugf("Found best move: %s", bestAction.toString());
         return bestAction;
     }
     

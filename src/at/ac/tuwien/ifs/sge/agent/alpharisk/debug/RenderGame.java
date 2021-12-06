@@ -19,7 +19,7 @@ package at.ac.tuwien.ifs.sge.agent.alpharisk.debug;
 
 import at.ac.tuwien.ifs.sge.agent.alpharisk.config.MuZeroConfig;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.gamebuffer.MuZeroGame;
-import at.ac.tuwien.ifs.sge.agent.alpharisk.play.Action;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.play.MuZeroAction;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
@@ -38,7 +38,7 @@ public class RenderGame {
 
         System.out.println("\n" + Objects.requireNonNull(replayGame).render());
         for (int i = 0; i < game.getGameDTO().getActionHistory().size(); i++) {
-            Action action = config.newAction(game.getGameDTO().getActionHistory().get(i));
+            MuZeroAction action = config.newAction(game.getGameDTO().getActionHistory().get(i));
 
 
             replayGame.apply(action);

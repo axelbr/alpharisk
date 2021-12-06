@@ -1,10 +1,14 @@
 plugins {
     id 'java'
+    id 'com.github.johnrengelman.shadow' version '7.1.0'
 }
 
-sourceCompatibility = 1.11
 group 'at.ac.ruwien.if.sge.agent'
-version '1.0-SNAPSHOT'
+version '0.1'
+
+java {
+    withSourcesJar()
+}
 
 repositories {
     mavenCentral()
@@ -33,18 +37,43 @@ dependencies {
     // https://mvnrepository.com/artifact/org.slf4j/slf4j-simple
     implementation group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.32'
 
-    implementation 'ai.djl.pytorch:pytorch-engine:0.14.0'
+    runtimeOnly "ai.djl.onnxruntime:onnxruntime-engine:0.14.0"
 
     compileOnly 'org.projectlombok:lombok:1.18.22'
     annotationProcessor 'org.projectlombok:lombok:1.18.22'
 }
 
-jar {
+//serviceLoader {
+//    serviceInterface 'ai.djl.engine.EngineProvider'
+//}
+project.configurations.implementation.setCanBeResolved(true)
+
+task uberJar(type: Jar) {
+    archiveClassifier = 'uber'
+
     manifest {
-        attributes 'Sge-Type': 'agent'
-        attributes 'Agent-Class': 'src.at.ac.tuwien.ifs.sge.agent.alpharisk.AlphaRisk'
-        attributes 'Agent-Name': 'AlphaRisk'
+        attributes('Sge-Type': 'agent',
+                'Agent-Class': 'at.ac.tuwien.ifs.sge.agent.alpharisk.AlphaRisk',
+                'Agent-Name': 'AlphaRisk')
     }
+
+    duplicatesStrategy = 'WARN'
+
+    from sourceSets.main.output
+
+    dependsOn configurations.runtimeClasspath
+    from {
+        configurations.runtimeClasspath.findAll { it.name }.collect { zipTree(it) }
+    }
+}
+
+shadowJar {
+    manifest {
+        attributes('Sge-Type': 'agent',
+                'Agent-Class': 'at.ac.tuwien.ifs.sge.agent.alpharisk.AlphaRisk',
+                'Agent-Name': 'AlphaRisk')
+    }
+    minimize()
 }
 
 sourceSets {

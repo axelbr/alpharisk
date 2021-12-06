@@ -22,7 +22,7 @@ import at.ac.tuwien.ifs.sge.agent.alpharisk.config.MuZeroConfig;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.model.Network;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.model.NetworkIO;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.gamebuffer.MuZeroGame;
-import at.ac.tuwien.ifs.sge.agent.alpharisk.play.Action;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.play.MuZeroAction;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.play.MCTS;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.play.MinMaxStats;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.play.Node;
@@ -104,24 +104,24 @@ public class Inference {
         double aiValue = networkOutput.getValue();
         int actionIndexSelectedByNetwork = -1;
         MCTS mcts = new MCTS(game.getConfig());
-        List<Action> legalActions = game.legalActions();
+        List<MuZeroAction> legalActions = game.legalActions();
         //  if (legalActions.size() == 0) return Pair.create(0d, -1);
         if (!withMCTS) {
 
             float[] policyValues = networkOutput.getPolicyValues();
-            List<Pair<Action, Double>> distributionInput =
+            List<Pair<MuZeroAction, Double>> distributionInput =
                     IntStream.range(0, game.getConfig().getActionSpaceSize())
                             .filter(i -> {
-                                Action action = game.getConfig().newAction(i);
+                                MuZeroAction action = game.getConfig().newAction(i);
                                 return legalActions.contains(action);
                             })
                             .mapToObj(i -> {
-                                Action action = game.getConfig().newAction(i);
+                                MuZeroAction action = game.getConfig().newAction(i);
                                 double v = policyValues[i];
                                 return new Pair<>(action, v);
                             }).collect(Collectors.toList());
 
-            Action action = mcts.selectActionByMaxFromDistribution(distributionInput);
+            MuZeroAction action = mcts.selectActionByMaxFromDistribution(distributionInput);
             actionIndexSelectedByNetwork = action.getIndex();
 
         } else {
@@ -129,7 +129,7 @@ public class Inference {
 
             mcts.expandNode(root, game.toPlay(), legalActions, networkOutput, false, network.getConfig());
             MinMaxStats minMaxStats = mcts.run(root, game.actionHistory(), network, null);
-            Action action = mcts.selectActionByMax(root, minMaxStats);
+            MuZeroAction action = mcts.selectActionByMax(root, minMaxStats);
             actionIndexSelectedByNetwork = action.getIndex();
 
 

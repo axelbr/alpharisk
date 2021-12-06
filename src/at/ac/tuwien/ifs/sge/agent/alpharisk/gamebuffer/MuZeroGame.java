@@ -25,10 +25,6 @@ import at.ac.tuwien.ifs.sge.agent.alpharisk.model.Sample;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.play.*;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.environment.Environment;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.environment.OneOfTwoPlayer;
-import at.ac.tuwien.ifs.sge.game.Game;
-import at.ac.tuwien.ifs.sge.game.risk.board.Risk;
-import at.ac.tuwien.ifs.sge.game.risk.board.RiskAction;
-import at.ac.tuwien.ifs.sge.game.risk.board.RiskBoard;
 import lombok.Data;
 import org.apache.commons.math3.util.Pair;
 import org.jetbrains.annotations.NotNull;
@@ -94,10 +90,10 @@ public abstract class MuZeroGame implements Serializable {
 
     abstract public boolean terminal();
 
-    abstract public List<Action> legalActions();
+    abstract public List<MuZeroAction> legalActions();
 
 
-    abstract public List<Action> allActionsInActionSpace();
+    abstract public List<MuZeroAction> allActionsInActionSpace();
 
     public void apply(int @NotNull ... actionIndex) {
         Arrays.stream(actionIndex).forEach(
@@ -105,7 +101,7 @@ public abstract class MuZeroGame implements Serializable {
         );
     }
 
-    public void apply(@NotNull Action action) {
+    public void apply(@NotNull MuZeroAction action) {
         float reward = this.environment.step(action);
 
         this.getGameDTO().getRewards().add(reward);
@@ -117,16 +113,16 @@ public abstract class MuZeroGame implements Serializable {
 
         float[] childVisit = new float[this.actionSpaceSize];
         if (fastRuleLearning) {
-            for (SortedMap.Entry<Action, Node> e : root.getChildren().entrySet()) {
-                Action action = e.getKey();
+            for (SortedMap.Entry<MuZeroAction, Node> e : root.getChildren().entrySet()) {
+                MuZeroAction action = e.getKey();
                 Node node = e.getValue();
                 childVisit[action.getIndex()] = (float) node.prior;
             }
         } else {
 
-            List<Pair<Action, Double>> distributionInput = MCTS.getDistributionInput(root, config, minMaxStats);
-            for (Pair<Action, Double> e : distributionInput) {
-                Action action = e.getKey();
+            List<Pair<MuZeroAction, Double>> distributionInput = MCTS.getDistributionInput(root, config, minMaxStats);
+            for (Pair<MuZeroAction, Double> e : distributionInput) {
+                MuZeroAction action = e.getKey();
                 double v = e.getValue();
                 childVisit[action.getIndex()] = (float) v;
             }
@@ -353,7 +349,7 @@ public abstract class MuZeroGame implements Serializable {
 
         int result = r.nextInt(this.config.getActionSpaceSize());
 
-        List<Action> actions = allActionsInActionSpace();
+        List<MuZeroAction> actions = allActionsInActionSpace();
         List<Integer> actionList = new ArrayList<>();
         for (int j = 0; j < i; j++) {
             actionList.add(r.nextInt(this.config.getActionSpaceSize()));

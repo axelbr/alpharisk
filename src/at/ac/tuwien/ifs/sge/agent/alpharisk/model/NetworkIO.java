@@ -20,7 +20,7 @@ package at.ac.tuwien.ifs.sge.agent.alpharisk.model;
 
 import ai.djl.ndarray.NDArray;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.config.MuZeroConfig;
-import at.ac.tuwien.ifs.sge.agent.alpharisk.play.Action;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.play.MuZeroAction;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -41,7 +41,7 @@ public class NetworkIO {
     private double reward;
 
     private NDArray hiddenState;
-    private Action action;
+    private MuZeroAction action;
     private MuZeroConfig config;
 
 

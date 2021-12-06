@@ -60,10 +60,10 @@ public class MCTS {
         }
     }
 
-    public static List<Pair<Action, Double>> getDistributionInput(@NotNull Node node, MuZeroConfig config, MinMaxStats minMaxStats) {
+    public static List<Pair<MuZeroAction, Double>> getDistributionInput(@NotNull Node node, MuZeroConfig config, MinMaxStats minMaxStats) {
 
-        List<Map.Entry<Action, Node>> list = new ArrayList<>(node.children.entrySet());
-        List<Pair<Action, Double>> distributionInput;
+        List<Map.Entry<MuZeroAction, Node>> list = new ArrayList<>(node.children.entrySet());
+        List<Pair<MuZeroAction, Double>> distributionInput;
         if (node.getVisitCount() != 0) {
             double multiplierLambda = multiplierLambda(node, config);
 
@@ -102,7 +102,7 @@ public class MCTS {
         return distributionInput;
     }
 
-    private static double calcAlpha(Node node, List<Map.Entry<Action, Node>> list, double multiplierLambda, double alphaMin, double alphaMax, MuZeroConfig config, MinMaxStats minMaxStats) {
+    private static double calcAlpha(Node node, List<Map.Entry<MuZeroAction, Node>> list, double multiplierLambda, double alphaMin, double alphaMax, MuZeroConfig config, MinMaxStats minMaxStats) {
         // dichotomic search
         double optPolicySum = 0d;
         double alpha = 0d;
@@ -124,7 +124,7 @@ public class MCTS {
         return alpha;
     }
 
-    private static double optPolicySum(List<Map.Entry<Action, Node>> list, double multiplierLambda, double alpha, MinMaxStats minMaxStats, MuZeroConfig config) {
+    private static double optPolicySum(List<Map.Entry<MuZeroAction, Node>> list, double multiplierLambda, double alpha, MinMaxStats minMaxStats, MuZeroConfig config) {
         return list.stream()
                 .mapToDouble(e -> {
                     Node child = e.getValue();
@@ -183,8 +183,8 @@ public class MCTS {
                 ActionHistory history = historyList.get(g);
                 searchPath.add(node);
                 while (node.expanded()) {
-                    Map.Entry<Action, Node> actionNodeEntry = selectChild(node, minMaxStats);
-                    Action action = actionNodeEntry.getKey();
+                    Map.Entry<MuZeroAction, Node> actionNodeEntry = selectChild(node, minMaxStats);
+                    MuZeroAction action = actionNodeEntry.getKey();
                     history.addAction(action);
                     node = actionNodeEntry.getValue();
                     nodeList.set(g, node);
@@ -200,7 +200,7 @@ public class MCTS {
             }).collect(Collectors.toList());
 
 
-            List<Action> lastActions = historyList.stream().map(ActionHistory::lastAction).collect(Collectors.toList());
+            List<MuZeroAction> lastActions = historyList.stream().map(ActionHistory::lastAction).collect(Collectors.toList());
             List<NDArray> actionList = lastActions.stream().map(action -> {
                 return network.getActionSpaceOnDevice().get(action.getIndex());
                 //   return a.duplicate();
@@ -281,7 +281,7 @@ public class MCTS {
         return buf.toString();
     }
 
-    public void expandNode(@NotNull Node node, Player toPlay, @NotNull List<Action> actions, NetworkIO networkOutput,
+    public void expandNode(@NotNull Node node, Player toPlay, @NotNull List<MuZeroAction> actions, NetworkIO networkOutput,
                            boolean fastRuleLearning, MuZeroConfig config) {
         node.toPlay = toPlay;
         if (!fastRuleLearning) {
@@ -290,18 +290,18 @@ public class MCTS {
         }
         if (fastRuleLearning) {
             double p = 1d / actions.size();
-            for (Action action : actions) {
+            for (MuZeroAction action : actions) {
                 node.children.put(action, new Node(config,p));  // p/policySum = probability that this action is chosen
             }
         } else {
-            Map<Action, Float> policy = actions.stream()
+            Map<MuZeroAction, Float> policy = actions.stream()
                     .collect(Collectors.toMap(a -> a, a -> networkOutput.getPolicyValues()[a.getIndex()]));
 
             double policySum = policy.values().stream()
                     .mapToDouble(Double::valueOf)
                     .sum();
-            for (Map.Entry<Action, Float> e : policy.entrySet()) {
-                Action action = e.getKey();
+            for (Map.Entry<MuZeroAction, Float> e : policy.entrySet()) {
+                MuZeroAction action = e.getKey();
                 Float p = e.getValue();
                 node.children.put(action, new Node(config, p / policySum));  // p/policySum = probability that this action is chosen
             }
@@ -309,29 +309,29 @@ public class MCTS {
         }
     }
 
-    public Map.@NotNull Entry<Action, Node> selectChild(@NotNull Node node, MinMaxStats minMaxStats) {
+    public Map.@NotNull Entry<MuZeroAction, Node> selectChild(@NotNull Node node, MinMaxStats minMaxStats) {
 
-        Action action = selectAction(node, minMaxStats);
+        MuZeroAction action = selectAction(node, minMaxStats);
 
         return Map.entry(action, node.children.get(action));
 
     }
 
-    public Action selectAction(@NotNull Node node, MinMaxStats minMaxStats) {
-        List<Pair<Action, Double>> distributionInput = getDistributionInput(node, config, minMaxStats);
+    public MuZeroAction selectAction(@NotNull Node node, MinMaxStats minMaxStats) {
+        List<Pair<MuZeroAction, Double>> distributionInput = getDistributionInput(node, config, minMaxStats);
 
-        Action action = selectActionByDrawingFromDistribution(distributionInput);
+        MuZeroAction action = selectActionByDrawingFromDistribution(distributionInput);
         return action;
     }
 
-    public Action selectActionByMax(@NotNull Node node, MinMaxStats minMaxStats) {
-        List<Pair<Action, Double>> distributionInput = getDistributionInput(node, config, minMaxStats);
+    public MuZeroAction selectActionByMax(@NotNull Node node, MinMaxStats minMaxStats) {
+        List<Pair<MuZeroAction, Double>> distributionInput = getDistributionInput(node, config, minMaxStats);
 
         return distributionInput.stream().max(Comparator.comparing(Pair::getValue)).get().getKey();
     }
 
-    public Action selectActionByDrawingFromDistribution(List<Pair<Action, Double>> distributionInput) {
-        EnumeratedDistribution<Action> distribution = null;
+    public MuZeroAction selectActionByDrawingFromDistribution(List<Pair<MuZeroAction, Double>> distributionInput) {
+        EnumeratedDistribution<MuZeroAction> distribution = null;
         try {
             distribution = new EnumeratedDistribution<>(rng, distributionInput);
         } catch (Exception e) {
@@ -346,7 +346,7 @@ public class MCTS {
         return config.getVisitSoftmaxTemperatureFn().apply(numMoves, numTrainingSteps);
     }
 
-    public Action selectActionByMaxFromDistribution(List<Pair<Action, Double>> distributionInput) {
+    public MuZeroAction selectActionByMaxFromDistribution(List<Pair<MuZeroAction, Double>> distributionInput) {
         Collections.shuffle(distributionInput);
         return distributionInput.stream()
                 .max(Comparator.comparing(Pair::getSecond))

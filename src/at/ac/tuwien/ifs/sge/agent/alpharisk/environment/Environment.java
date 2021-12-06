@@ -18,7 +18,7 @@
 package at.ac.tuwien.ifs.sge.agent.alpharisk.environment;
 
 
-import at.ac.tuwien.ifs.sge.agent.alpharisk.play.Action;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.play.MuZeroAction;
 
 import java.util.List;
 
@@ -32,7 +32,7 @@ public interface Environment {
      *
      * @return immediate reward
      */
-    float step(Action action);
+    float step(MuZeroAction action);
 
 
     // the environment reveals the following information abouts its state
@@ -40,9 +40,9 @@ public interface Environment {
 
     boolean terminal();
 
-    List<Action> legalActions();
+    List<MuZeroAction> legalActions();
 
 
     // general information about the environment
-    List<Action> allActionsInActionSpace();
+    List<MuZeroAction> allActionsInActionSpace();
 }

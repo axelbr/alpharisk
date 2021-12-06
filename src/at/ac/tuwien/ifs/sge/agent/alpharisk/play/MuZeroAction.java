@@ -22,14 +22,13 @@ import ai.djl.ndarray.NDManager;
 import ai.djl.ndarray.types.Shape;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.config.MuZeroConfig;
 
+import at.ac.tuwien.ifs.sge.game.risk.board.RiskAction;
 import org.jetbrains.annotations.NotNull;
 
 
-public interface Action  {
+public interface MuZeroAction {
 
-
-
-    public static NDArray encodeEmptyNDArray(@NotNull MuZeroConfig config, @NotNull NDManager nd) {
+    static NDArray encodeEmptyNDArray(@NotNull MuZeroConfig config, @NotNull NDManager nd) {
         return nd.zeros(new Shape(1, config.getBoardHeight(), config.getBoardWidth()));
     }
 
