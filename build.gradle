@@ -26,34 +26,13 @@ dependencies {
     implementation group: 'at.ac.tuwien.ifs.sge', name: 'sge', version: '1.0.2'
     implementation group: 'at.ac.tuwien.ifs.sge', name: 'sge-risk', version: '1.0.2'
     // https://mvnrepository.com/artifact/ai.djl/api
-    implementation group: 'ai.djl', name: 'api', version: '0.14.0'
-    // https://mvnrepository.com/artifact/org.jetbrains/annotations
-    implementation group: 'org.jetbrains', name: 'annotations', version: '23.0.0'
-    // https://mvnrepository.com/artifact/org.apache.commons/commons-math3
-    implementation group: 'org.apache.commons', name: 'commons-math3', version: '3.6.1'
+    implementation group: 'ai.djl', name: 'api', version: '0.13.0'
+    implementation "ai.djl.onnxruntime:onnxruntime-engine:0.13.0"
+
     // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.12.0'
-    // https://mvnrepository.com/artifact/commons-io/commons-io
-    implementation group: 'commons-io', name: 'commons-io', version: '2.11.0'
-    // https://mvnrepository.com/artifact/ca.umontreal.iro.simul/ssj
-    implementation group: 'ca.umontreal.iro.simul', name: 'ssj', version: '3.3.1'
-    // https://mvnrepository.com/artifact/org.apache.commons/commons-csv
-    implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.9.0'
-    // https://mvnrepository.com/artifact/org.slf4j/slf4j-api
-    implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.32'
-    // https://mvnrepository.com/artifact/org.slf4j/slf4j-simple
-    implementation group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.32'
-
-    runtimeOnly "ai.djl.onnxruntime:onnxruntime-engine:0.14.0"
-
-    compileOnly 'org.projectlombok:lombok:1.18.22'
-    annotationProcessor 'org.projectlombok:lombok:1.18.22'
 }
 
-//serviceLoader {
-//    serviceInterface 'ai.djl.engine.EngineProvider'
-//}
-project.configurations.implementation.setCanBeResolved(true)
 
 task uberJar(type: Jar) {
     archiveClassifier = 'uber'
@@ -66,30 +45,17 @@ task uberJar(type: Jar) {
 
     duplicatesStrategy = 'WARN'
 
-    from sourceSets.main.allSource
+    from sourceSets.main.output
+
     dependsOn configurations.runtimeClasspath
     from {
-        configurations.runtimeClasspath.findAll { it.name }.collect { zipTree(it) }
+        configurations.runtimeClasspath.findAll { it.name.endsWith('jar') }.collect { zipTree(it) }
     }
 
-    exclude("at/ac/tuwien/ifs/sge/agent/alphabetaagent")
-    exclude("at/ac/tuwien/ifs/sge/agent/mctsagent")
-    exclude("at/ac/tuwien/ifs/sge/agent/randomagent")
-    exclude("at/ac/tuwien/ifs/sge/agent/risk")
-}
-
-shadowJar {
-    manifest {
-        attributes('Sge-Type': 'agent',
-                'Agent-Class': 'at.ac.tuwien.ifs.sge.agent.alpharisk.AlphaRisk',
-                'Agent-Name': 'AlphaRisk')
-    }
-
-    exclude("at/ac/tuwien/ifs/sge/agent/alphabetaagent")
-    exclude("at/ac/tuwien/ifs/sge/agent/mctsagent")
-    exclude("at/ac/tuwien/ifs/sge/agent/randomagent")
-    exclude("at/ac/tuwien/ifs/sge/agent/risk")
-    minimize()
+    exclude("at/ac/tuwien/ifs/sge/agent/alphabetaagent",
+     "at/ac/tuwien/ifs/sge/agent/mctsagent",
+     "at/ac/tuwien/ifs/sge/agent/randomagent",
+     "at/ac/tuwien/ifs/sge/agent/risk")
 }
 
 sourceSets {
@@ -98,4 +64,15 @@ sourceSets {
             srcDirs = ['src']
         }
     }
+}
+
+shadowJar {
+    manifest {
+        inheritFrom project.tasks.uberJar.manifest
+    }
+    exclude("at/ac/tuwien/ifs/sge/agent/alphabetaagent")
+    exclude("at/ac/tuwien/ifs/sge/agent/mctsagent")
+    exclude("at/ac/tuwien/ifs/sge/agent/randomagent")
+    exclude("at/ac/tuwien/ifs/sge/agent/risk")
+    minimize()
 }
