@@ -3,7 +3,7 @@ plugins {
     id 'com.github.johnrengelman.shadow' version '7.1.0'
 }
 
-group 'at.ac.ruwien.if.sge.agent'
+group 'at.ac.tuwien.ifs.sge.agent'
 version '0.1'
 
 java {
@@ -23,8 +23,12 @@ repositories {
 }
 
 dependencies {
-    implementation group: 'at.ac.tuwien.ifs.sge', name: 'sge', version: '1.0.2'
-    implementation group: 'at.ac.tuwien.ifs.sge', name: 'sge-risk', version: '1.0.2'
+    //implementation group: 'at.ac.tuwien.ifs.sge', name: 'sge', version: '1.0.2'
+    //implementation group: 'at.ac.tuwien.ifs.sge', name: 'sge-risk', version: '1.0.2'
+
+    implementation fileTree(dir: 'TestEnvironment', include: ['*.jar'])
+
+
     // https://mvnrepository.com/artifact/ai.djl/api
     implementation group: 'ai.djl', name: 'api', version: '0.14.0'
     // https://mvnrepository.com/artifact/org.jetbrains/annotations
@@ -90,12 +94,4 @@ shadowJar {
     exclude("at/ac/tuwien/ifs/sge/agent/randomagent")
     exclude("at/ac/tuwien/ifs/sge/agent/risk")
     minimize()
-}
-
-sourceSets {
-    main {
-        java {
-            srcDirs = ['src']
-        }
-    }
 }
