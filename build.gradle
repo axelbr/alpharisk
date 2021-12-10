@@ -25,10 +25,7 @@ repositories {
 dependencies {
     //implementation group: 'at.ac.tuwien.ifs.sge', name: 'sge', version: '1.0.2'
     //implementation group: 'at.ac.tuwien.ifs.sge', name: 'sge-risk', version: '1.0.2'
-
     implementation fileTree(dir: 'TestEnvironment', include: ['*.jar'])
-
-
     // https://mvnrepository.com/artifact/ai.djl/api
     implementation group: 'ai.djl', name: 'api', version: '0.14.0'
     // https://mvnrepository.com/artifact/org.jetbrains/annotations
