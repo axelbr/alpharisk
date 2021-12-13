@@ -1,9 +1,8 @@
 package at.ac.tuwien.ifs.sge.agent.alpharisk;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import ai.djl.MalformedModelException;
@@ -13,9 +12,7 @@ import ai.djl.modality.rl.agent.RlAgent;
 import ai.djl.modality.rl.env.RlEnv;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Activation;
-import ai.djl.nn.Blocks;
 import ai.djl.nn.SequentialBlock;
-import ai.djl.nn.convolutional.Conv2d;
 import ai.djl.nn.core.Linear;
 import ai.djl.training.DefaultTrainingConfig;
 import ai.djl.training.Trainer;
@@ -24,7 +21,6 @@ import ai.djl.training.listener.TrainingListener;
 import ai.djl.training.loss.Loss;
 import ai.djl.training.optimizer.Adam;
 import ai.djl.training.tracker.Tracker;
-import ai.djl.util.Pair;
 import at.ac.tuwien.ifs.sge.agent.AbstractGameAgent;
 import at.ac.tuwien.ifs.sge.agent.GameAgent;
 import at.ac.tuwien.ifs.sge.engine.Logger;
@@ -47,68 +43,66 @@ public class AlphaRisk extends AbstractGameAgent<Risk, RiskAction> implements Ga
     public final Model model;
     public final Trainer trainer;
     public boolean training;
+    private boolean isInitialized = false;
 
     public Logger getLogger() {
         return this.log;
     }
 
     public AlphaRisk(final Logger log) {
-        this(log, false, true, Path.of(MODEL_PATH));
+        this(log, false);
     }
 
-    public AlphaRisk(Logger log, boolean training, boolean load, Path from) {
+    public AlphaRisk(Logger log, boolean training) {
         super(0.75, 5L, TimeUnit.SECONDS, log);
         this.training = training;
-        model = createOrLoadModel(load, from);
+        model = Model.newInstance("QNetwork");
         trainer = new Trainer(model, setupTrainingConfig());
         agent = new QAgent(trainer, REWARD_DISCOUNT);
     }
 
-    public AlphaRisk(boolean training, boolean load, Path from) {
+    public AlphaRisk(boolean training) {
         this(new Logger(0, "[sge ", "",
                         "trace]: ", System.out, "",
                         "debug]: ", System.out, "",
                         "info]: ", System.out, "",
                         "warn]: ", System.err, "",
-                        "error]: ", System.err, ""), training, load, from);
+                        "error]: ", System.err, ""), training);
     }
 
-    public static Model createOrLoadModel(boolean load, Path from) {
-        Model model = Model.newInstance("QNetwork");
-        model.setBlock(getBlock());
-        if (load) {
+    private void initialize(Shape[] input_shape, int num_actions, boolean load, Path from){
+        if (isInitialized) return;
+
+        model.setBlock(getBlock(num_actions));
+        if (load && Files.exists(from)) {
             try {
                 model.load(from);
             } catch (IOException | MalformedModelException e) {
                 e.printStackTrace();
             }
         }
-        return model;
+
+        trainer.initialize(input_shape);
+        isInitialized = true;
     }
 
-    public static SequentialBlock getBlock() {
-        // conv -> conv -> conv -> fc -> fc
+    private static SequentialBlock getBlock(int num_actions) {
         return new SequentialBlock()
-            .add(Conv2d.builder()
-                     .setKernelShape(new Shape(8, 8))
-                     .optStride(new Shape(4, 4))
-                     .optPadding(new Shape(3, 3))
-                     .setFilters(4).build())
+            .add(Linear.builder()
+                     .setUnits(1024)
+                     .build())
             .add(Activation::relu)
 
-            .add(Conv2d.builder()
-                     .setKernelShape(new Shape(4, 4))
-                     .optStride(new Shape(2, 2))
-                     .setFilters(32).build())
+            .add(Linear.builder()
+                     .setUnits(1024)
+                     .build())
             .add(Activation::relu)
 
-            .add(Conv2d.builder()
-                     .setKernelShape(new Shape(3, 3))
-                     .optStride(new Shape(1, 1))
-                     .setFilters(64).build())
+            .add(Linear.builder()
+                     .setUnits(1024)
+                     .build())
             .add(Activation::relu)
 
-            .add(Blocks.batchFlattenBlock())
             .add(Linear
                      .builder()
                      .setUnits(512).build())
@@ -116,7 +110,7 @@ public class AlphaRisk extends AbstractGameAgent<Risk, RiskAction> implements Ga
 
             .add(Linear
                      .builder()
-                     .setUnits(2).build());
+                     .setUnits(num_actions).build());
     }
 
     public void setUp(final int numberOfPlayers, final int playerId) {
@@ -129,6 +123,7 @@ public class AlphaRisk extends AbstractGameAgent<Risk, RiskAction> implements Ga
     public RiskAction computeNextAction(final Risk game, final long computationTime, final TimeUnit timeUnit) {
 
         RlEnv rlEnv = new RiskRlEnvWrapper(game);
+        initialize(rlEnv.getObservation().getShapes(),rlEnv.getActionSpace().size(),true,Path.of(MODEL_PATH));
         final int nextMoveInt = agent.chooseAction(rlEnv, this.training).singletonOrThrow().getInt();
         RiskAction bestAction = (RiskAction) game.getPossibleActions().toArray()[nextMoveInt];
 

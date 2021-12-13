@@ -42,7 +42,7 @@ public class TrainingAndTest {
     public static void train() {
 
         RiskRlEnvWrapper game = new RiskRlEnvWrapper();
-        AlphaRisk alphaRisk = new AlphaRisk(true, false, null);
+        AlphaRisk alphaRisk = new AlphaRisk(true);
 
         //DefaultTrainingConfig config = setupTrainingConfig();
         try (Trainer trainer = alphaRisk.trainer){

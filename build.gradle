@@ -27,7 +27,10 @@ dependencies {
     implementation group: 'at.ac.tuwien.ifs.sge', name: 'sge-risk', version: '1.0.2'
     // https://mvnrepository.com/artifact/ai.djl/api
     implementation group: 'ai.djl', name: 'api', version: '0.13.0'
-    implementation "ai.djl.onnxruntime:onnxruntime-engine:0.13.0"
+
+    runtimeOnly group: 'ai.djl.mxnet', name: 'mxnet-native-auto', version: '1.8.0'
+
+    implementation 'ai.djl.mxnet:mxnet-engine:0.14.0'
 
     // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.12.0'
