@@ -25,9 +25,15 @@ repositories {
 dependencies {
     //implementation group: 'at.ac.tuwien.ifs.sge', name: 'sge', version: '1.0.2'
     //implementation group: 'at.ac.tuwien.ifs.sge', name: 'sge-risk', version: '1.0.2'
-    implementation fileTree(dir: 'TestEnvironment', include: ['*.jar'])
+
+    implementation fileTree(dir: 'environment', include: ['*.jar'])
+
     // https://mvnrepository.com/artifact/ai.djl/api
     implementation group: 'ai.djl', name: 'api', version: '0.14.0'
+    implementation group: 'ai.djl', name: 'model-zoo', version: '0.14.0'
+    implementation group: 'ai.djl.pytorch', name: 'pytorch-engine', version: '0.14.0'
+    implementation group: 'ai.djl.pytorch', name: 'pytorch-native-auto', version: '1.9.1'
+
     // https://mvnrepository.com/artifact/org.jetbrains/annotations
     implementation group: 'org.jetbrains', name: 'annotations', version: '23.0.0'
     // https://mvnrepository.com/artifact/org.apache.commons/commons-math3
@@ -45,10 +51,18 @@ dependencies {
     // https://mvnrepository.com/artifact/org.slf4j/slf4j-simple
     implementation group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.32'
 
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+    testImplementation 'org.junit.jupiter:junit-jupiter-params:5.8.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+
     runtimeOnly "ai.djl.onnxruntime:onnxruntime-engine:0.14.0"
 
     compileOnly 'org.projectlombok:lombok:1.18.22'
     annotationProcessor 'org.projectlombok:lombok:1.18.22'
+}
+
+test {
+    useJUnitPlatform()
 }
 
 //serviceLoader {
@@ -82,7 +96,7 @@ task uberJar(type: Jar) {
 shadowJar {
     manifest {
         attributes('Sge-Type': 'agent',
-                'Agent-Class': 'at.ac.tuwien.ifs.sge.agent.alpharisk.AlphaRisk',
+                'Agent-Class': 'at.ac.tuwien.ifs.sge.agent.alpharisk.RiskAgent',
                 'Agent-Name': 'AlphaRisk')
     }
 

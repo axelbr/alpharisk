@@ -28,6 +28,7 @@ public class RiskAgent extends AbstractGameAgent<Risk, RiskAction> implements Ga
         final RiskBoard board = game.getBoard();
         board.getNrOfTerritoriesOccupiedByPlayer(this.playerId);
         game.getHeuristicValue();
+
         game.getHeuristicValue(this.playerId);
         final Set<RiskAction> possibleActions = game.getPossibleActions();
         double bestUtilityValue = Double.NEGATIVE_INFINITY;
