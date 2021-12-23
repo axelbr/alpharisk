@@ -5,28 +5,31 @@ import ai.djl.ndarray.types.Shape;
 import ai.djl.nn.Activation;
 import ai.djl.nn.Block;
 import ai.djl.nn.SequentialBlock;
+import ai.djl.nn.norm.BatchNorm;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.adapters.ActionAdapter;
 
 
 public class Models {
     private Models() {}
 
+
+
     public static Block makeSharedBlock(Shape stateDim) {
         return new Mlp((int) stateDim.get(0), 128, new int[]{256, 256, 256, 256, 256});
     }
 
-    public static Block makeValueHead(Block sharedBlock) {
+    public static Block makeValueHead(Shape inputDim) {
         SequentialBlock head = new SequentialBlock();
-        head.add(sharedBlock);
-        Mlp valueLayers = new Mlp((int) getOutputShape(sharedBlock).get(0), 2, new int[]{256, 128});
-        head.add(valueLayers);
+        head.add(BatchNorm.builder().build());
+        head.add(new Mlp((int) inputDim.get(0), 1, new int[]{256, 128}));
+        head.add(Activation.tanhBlock());
         return head;
     }
 
-    public static Block makePolicyHead(Block sharedBlock) {
+    public static Block makeActionModelHead(Shape inputDim, Shape outputDim) {
         SequentialBlock head = new SequentialBlock();
-        head.add(sharedBlock);
-        Mlp valueLayers = new Mlp((int) getOutputShape(sharedBlock).get(0), 2, new int[]{256, 128});
-        head.add(valueLayers);
+        head.add(BatchNorm.builder().build());
+        head.add(new Mlp((int) inputDim.get(0), (int) outputDim.get(0), new int[]{256, 128}));
         return head;
     }
 
