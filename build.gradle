@@ -23,8 +23,8 @@ repositories {
 }
 
 dependencies {
-    //implementation group: 'at.ac.tuwien.ifs.sge', name: 'sge', version: '1.0.2'
-    //implementation group: 'at.ac.tuwien.ifs.sge', name: 'sge-risk', version: '1.0.2'
+    implementation group: 'at.ac.tuwien.ifs.sge', name: 'sge', version: '1.0.2'
+    implementation group: 'at.ac.tuwien.ifs.sge', name: 'sge-risk', version: '1.0.2'
 
     implementation fileTree(dir: 'environment', include: ['*.jar'])
 
@@ -57,8 +57,6 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-params:5.8.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
 
-    runtimeOnly "ai.djl.onnxruntime:onnxruntime-engine:0.14.0"
-
     compileOnly 'org.projectlombok:lombok:1.18.22'
     annotationProcessor 'org.projectlombok:lombok:1.18.22'
 }
@@ -67,37 +65,13 @@ test {
     useJUnitPlatform()
 }
 
-//serviceLoader {
-//    serviceInterface 'ai.djl.engine.EngineProvider'
-//}
 project.configurations.implementation.setCanBeResolved(true)
-
-task uberJar(type: Jar) {
-    archiveClassifier = 'all'
-
-    manifest {
-        attributes('Sge-Type': 'agent',
-                'Agent-Class': 'at.ac.tuwien.ifs.sge.agent.alpharisk.AlphaRiskAgent',
-                'Agent-Name': 'AlphaRisk')
-    }
-
-    duplicatesStrategy = 'WARN'
-
-    from sourceSets.main.allSource
-    dependsOn configurations.runtimeClasspath
-    from {
-        configurations.runtimeClasspath.findAll { it.name }.collect { zipTree(it) }
-    }
-
-    exclude("at/ac/tuwien/ifs/sge/agent/alphabetaagent")
-    exclude("at/ac/tuwien/ifs/sge/agent/mctsagent")
-    exclude("at/ac/tuwien/ifs/sge/agent/randomagent")
-    exclude("at/ac/tuwien/ifs/sge/agent/risk")
-}
 
 shadowJar {
     manifest {
-        attributes('Sge-Type': 'agent',
+        attributes(
+                'Main-Class': 'at.ac.tuwien.ifs.sge.agent.alpharisk.training.Trainer',
+                'Sge-Type': 'agent',
                 'Agent-Class': 'at.ac.tuwien.ifs.sge.agent.alpharisk.AlphaRiskAgent',
                 'Agent-Name': 'AlphaRisk')
     }
@@ -106,5 +80,5 @@ shadowJar {
     exclude("at/ac/tuwien/ifs/sge/agent/mctsagent")
     exclude("at/ac/tuwien/ifs/sge/agent/randomagent")
     exclude("at/ac/tuwien/ifs/sge/agent/risk")
-    minimize()
+    //minimize()
 }
