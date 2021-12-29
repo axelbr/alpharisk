@@ -73,11 +73,11 @@ test {
 project.configurations.implementation.setCanBeResolved(true)
 
 task uberJar(type: Jar) {
-    archiveClassifier = 'uber'
+    archiveClassifier = 'all'
 
     manifest {
         attributes('Sge-Type': 'agent',
-                'Agent-Class': 'at.ac.tuwien.ifs.sge.agent.alpharisk.AlphaRisk',
+                'Agent-Class': 'at.ac.tuwien.ifs.sge.agent.alpharisk.AlphaRiskAgent',
                 'Agent-Name': 'AlphaRisk')
     }
 
@@ -98,7 +98,7 @@ task uberJar(type: Jar) {
 shadowJar {
     manifest {
         attributes('Sge-Type': 'agent',
-                'Agent-Class': 'at.ac.tuwien.ifs.sge.agent.alpharisk.RiskAgent',
+                'Agent-Class': 'at.ac.tuwien.ifs.sge.agent.alpharisk.AlphaRiskAgent',
                 'Agent-Name': 'AlphaRisk')
     }
 

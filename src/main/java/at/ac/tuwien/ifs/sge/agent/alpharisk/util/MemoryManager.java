@@ -1,4 +1,4 @@
-package at.ac.tuwien.ifs.sge.agent.util;
+package at.ac.tuwien.ifs.sge.agent.alpharisk.util;
 
 import ai.djl.Device;
 import ai.djl.ndarray.NDManager;

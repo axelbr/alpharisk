@@ -15,6 +15,10 @@ import java.util.concurrent.TimeUnit;
 public class AlphaRiskAgent extends AbstractGameAgent<Risk, RiskAction> implements GameAgent<Risk, RiskAction> {
     private final AlphaZero algorithm;
 
+    public AlphaRiskAgent(final Logger log) {
+        this(log,null);
+    }
+
     public AlphaRiskAgent(final Logger log, ActionValueModel model) {
         super(0.75, 5L, TimeUnit.SECONDS, log);
         this.algorithm = new AlphaZero(playerId, model);

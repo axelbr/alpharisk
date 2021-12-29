@@ -6,11 +6,8 @@ import ai.djl.ndarray.index.NDIndex;
 import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.adapters.ActionAdapter;
-import at.ac.tuwien.ifs.sge.agent.alpharisk.adapters.StateAdapter;
-import at.ac.tuwien.ifs.sge.agent.util.MemoryManager;
-import at.ac.tuwien.ifs.sge.game.risk.board.Risk;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.util.MemoryManager;
 import at.ac.tuwien.ifs.sge.game.risk.board.RiskAction;
-import at.ac.tuwien.ifs.sge.game.risk.board.RiskBoard;
 
 public class AttackAction implements ActionAdapter<RiskAction> {
 

@@ -1,7 +1,7 @@
 package at.ac.tuwien.ifs.sge.agent.alpharisk.algorithm;
 
 import ai.djl.ndarray.NDArray;
-import at.ac.tuwien.ifs.sge.agent.util.MemoryManager;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.util.MemoryManager;
 import at.ac.tuwien.ifs.sge.game.risk.board.Risk;
 import at.ac.tuwien.ifs.sge.game.risk.board.RiskAction;
 

@@ -14,7 +14,7 @@ import at.ac.tuwien.ifs.sge.agent.alpharisk.adapters.actions.ReinforceAction;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.model.ActionProbabilityTranslator;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.model.ActionValueBlock;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.model.ValueTranslator;
-import at.ac.tuwien.ifs.sge.agent.util.MemoryManager;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.util.MemoryManager;
 import at.ac.tuwien.ifs.sge.game.risk.board.Risk;
 import at.ac.tuwien.ifs.sge.game.risk.board.RiskAction;
 import org.javatuples.Pair;
