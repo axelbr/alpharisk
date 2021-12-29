@@ -25,42 +25,24 @@ repositories {
 dependencies {
     implementation group: 'at.ac.tuwien.ifs.sge', name: 'sge', version: '1.0.2'
     implementation group: 'at.ac.tuwien.ifs.sge', name: 'sge-risk', version: '1.0.2'
+
+    implementation fileTree(dir: 'environment', include: ['*.jar'])
+
     // https://mvnrepository.com/artifact/ai.djl/api
     implementation group: 'ai.djl', name: 'api', version: '0.14.0'
+    implementation group: 'ai.djl', name: 'model-zoo', version: '0.14.0'
     implementation group: 'ai.djl.pytorch', name: 'pytorch-engine', version: '0.14.0'
-    // https://mvnrepository.com/artifact/ai.djl.pytorch/pytorch-native-cpu
-    implementation 'ai.djl.pytorch:pytorch-native-cpu:1.9.1'
+    implementation group: 'ai.djl.pytorch', name: 'pytorch-native-auto', version: '1.9.1'
 
     // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.12.0'
     // https://mvnrepository.com/artifact/org.slf4j/slf4j-simple
-    implementation 'org.slf4j:slf4j-simple:1.7.32'
+    implementation group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.32'
 
 }
 
-
-task uberJar(type: Jar) {
-    archiveClassifier = 'all'
-
-    manifest {
-        attributes('Sge-Type': 'agent',
-                'Agent-Class': 'at.ac.tuwien.ifs.sge.agent.alpharisk.AlphaRisk',
-                'Agent-Name': 'AlphaRisk')
-    }
-
-    duplicatesStrategy = 'WARN'
-
-    from sourceSets.main.output
-
-    dependsOn configurations.runtimeClasspath
-    from {
-        configurations.runtimeClasspath.findAll { it.name.endsWith('jar') }.collect { zipTree(it) }
-    }
-
-    exclude("at/ac/tuwien/ifs/sge/agent/alphabetaagent",
-     "at/ac/tuwien/ifs/sge/agent/mctsagent",
-     "at/ac/tuwien/ifs/sge/agent/randomagent",
-     "at/ac/tuwien/ifs/sge/agent/risk")
+test {
+    useJUnitPlatform()
 }
 
 sourceSets {
@@ -71,13 +53,20 @@ sourceSets {
     }
 }
 
+project.configurations.implementation.setCanBeResolved(true)
+
 shadowJar {
     manifest {
-        inheritFrom project.tasks.uberJar.manifest
+        attributes(
+                'Main-Class': 'at.ac.tuwien.ifs.sge.agent.alpharisk.TrainingAndTest',
+                'Sge-Type': 'agent',
+                'Agent-Class': 'at.ac.tuwien.ifs.sge.agent.alpharisk.AlphaRisk',
+                'Agent-Name': 'AlphaRisk')
     }
+
     exclude("at/ac/tuwien/ifs/sge/agent/alphabetaagent")
     exclude("at/ac/tuwien/ifs/sge/agent/mctsagent")
     exclude("at/ac/tuwien/ifs/sge/agent/randomagent")
     exclude("at/ac/tuwien/ifs/sge/agent/risk")
-    minimize()
+    //minimize()
 }
