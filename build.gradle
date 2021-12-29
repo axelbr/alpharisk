@@ -3,7 +3,7 @@ plugins {
     id 'com.github.johnrengelman.shadow' version '7.1.0'
 }
 
-group 'at.ac.ruwien.if.sge.agent'
+group 'at.ac.tuwien.ifs.sge.agent'
 version '0.1'
 
 java {
@@ -25,19 +25,22 @@ repositories {
 dependencies {
     implementation group: 'at.ac.tuwien.ifs.sge', name: 'sge', version: '1.0.2'
     implementation group: 'at.ac.tuwien.ifs.sge', name: 'sge-risk', version: '1.0.2'
-
-    // https://mvnrepository.com/artifact/org.deeplearning4j/deeplearning4j-core
-    implementation 'org.deeplearning4j:deeplearning4j-core:1.0.0-M1.1'
-    // https://mvnrepository.com/artifact/org.nd4j/nd4j-native
-    testImplementation 'org.nd4j:nd4j-native:1.0.0-M1.1'
+    // https://mvnrepository.com/artifact/ai.djl/api
+    implementation group: 'ai.djl', name: 'api', version: '0.14.0'
+    implementation group: 'ai.djl.pytorch', name: 'pytorch-engine', version: '0.14.0'
+    // https://mvnrepository.com/artifact/ai.djl.pytorch/pytorch-native-cpu
+    implementation 'ai.djl.pytorch:pytorch-native-cpu:1.9.1'
 
     // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.12.0'
+    // https://mvnrepository.com/artifact/org.slf4j/slf4j-simple
+    implementation 'org.slf4j:slf4j-simple:1.7.32'
+
 }
 
 
 task uberJar(type: Jar) {
-    archiveClassifier = 'uber'
+    archiveClassifier = 'all'
 
     manifest {
         attributes('Sge-Type': 'agent',
