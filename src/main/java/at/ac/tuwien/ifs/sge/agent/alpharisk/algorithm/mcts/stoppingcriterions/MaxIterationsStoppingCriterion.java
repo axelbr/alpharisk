@@ -1,13 +1,17 @@
-package at.ac.tuwien.ifs.sge.agent.alpharisk.mcts.util;
-
-import at.ac.tuwien.ifs.sge.agent.alpharisk.mcts.StoppingCriterion;
+package at.ac.tuwien.ifs.sge.agent.alpharisk.algorithm.mcts.stoppingcriterions;
 
 public class MaxIterationsStoppingCriterion implements StoppingCriterion {
-    private int n;
+    private int n, initialN;
 
     public MaxIterationsStoppingCriterion(int n) {
         assert n > 0;
         this.n = n;
+        initialN = n;
+    }
+
+    @Override
+    public void reset() {
+        n = initialN;
     }
 
     @Override

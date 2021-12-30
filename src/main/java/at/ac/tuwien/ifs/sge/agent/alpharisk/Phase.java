@@ -15,7 +15,8 @@ public enum Phase {
     REINFORCE("REINFORCE"),
     ATTACK("ATTACK"),
     OCCUPY("OCCUPY"),
-    FORTIFY("FORTIFY");
+    FORTIFY("FORTIFY"),
+    TERMINATED("TERMINATED");
 
     private String name;
 
@@ -40,14 +41,18 @@ public enum Phase {
     }
 
     private Phase updateDefault(Risk state) {
-        if (state.getBoard().isReinforcementPhase()) {
+        if (state.isGameOver()) {
+            return Phase.TERMINATED;
+        } else if (state.getBoard().isReinforcementPhase()) {
             return Phase.REINFORCE;
         } else if (state.getBoard().isAttackPhase()) {
             return Phase.ATTACK;
         } else if (state.getBoard().isOccupyPhase()) {
             return Phase.OCCUPY;
-        } else {
+        } else if (state.getBoard().isFortifyPhase()) {
             return Phase.FORTIFY;
+        }  else {
+            throw new IllegalStateException("Illegal game phase");
         }
     }
 
