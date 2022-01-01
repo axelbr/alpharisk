@@ -7,8 +7,10 @@ import at.ac.tuwien.ifs.sge.agent.alpharisk.algorithm.heuristics.utility.Maximiz
 import at.ac.tuwien.ifs.sge.agent.alpharisk.algorithm.mcts.backpropagation.BackpropagationStrategy;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.algorithm.mcts.backpropagation.NegamaxBackupStrategy;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.algorithm.mcts.expansion.ExpandAllSelectRandom;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.algorithm.mcts.expansion.ExpandSingleNodeStrategy;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.algorithm.mcts.expansion.ExpansionStrategy;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.algorithm.mcts.simulation.DefaultSimulationStrategy;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.algorithm.mcts.simulation.RandomSimulationStrategy;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.algorithm.mcts.simulation.SimulationStrategy;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.algorithm.mcts.selection.UCTSelection;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.algorithm.mcts.selection.TreePolicy;
@@ -32,6 +34,8 @@ public class MonteCarloTreeSearch {
         public int maxIterations = 128;
     }
 
+    private Tree<Node> root;
+
     private TreePolicy treePolicy;
     private SimulationStrategy simulationStrategy;
     private ExpansionStrategy expansionStrategy;
@@ -41,12 +45,8 @@ public class MonteCarloTreeSearch {
 
     public MonteCarloTreeSearch(HyperParameters parameters) {
         this.treePolicy = new UCTSelection(parameters.explorationConstant);
-        this.simulationStrategy = new DefaultSimulationStrategy(
-                Map.of(Phase.REINFORCE, new BorderSecurityThreatHeuristic()),
-                new MaximizeControlledTerritoriesHeuristic(),
-                new MaxIterationsStoppingCriterion(parameters.maxIterations)
-        );
-        this.expansionStrategy = new ExpandAllSelectRandom();
+        this.simulationStrategy = new RandomSimulationStrategy(new MaxIterationsStoppingCriterion(256));
+        this.expansionStrategy = new ExpandSingleNodeStrategy();
         this.backpropagationStrategy = new NegamaxBackupStrategy();
     }
 
@@ -90,12 +90,15 @@ public class MonteCarloTreeSearch {
     }
 
     public RiskAction computeAction(RiskState state) {
-        Tree<Node> root = new DoubleLinkedTree<>(NodeFactory.makeRoot(state));
-        var node = root;
+        if (root == null) {
+            root = new DoubleLinkedTree<>(NodeFactory.makeRoot(state));
+        } else {
+            reRootTree(state);
+        }
         currentBestAction = Util.selectRandom(state.getGame().getPossibleActions());
-        var stoppingCriterion = new MaxIterationsStoppingCriterion(128);
+        var stoppingCriterion = new MaxIterationsStoppingCriterion(5000);
         while (!stoppingCriterion.shouldStop()) {
-            node = treePolicy.apply(root);
+            var node = treePolicy.apply(root);
             node = expansionStrategy.apply(node);
             double value = simulationStrategy.apply(node);
             backpropagationStrategy.apply(node, value);
@@ -109,11 +112,32 @@ public class MonteCarloTreeSearch {
     }
 
     private RiskAction getBestAction(Tree<Node> node, int playerId) {
-        return node.getChildren().stream()
+        var action = node.getChildren().stream()
                 .map(Tree::getNode)
                 .max(Comparator.comparingDouble(Node::getValue))
                 .orElseThrow()
                 .getAction()
                 .orElseThrow();
+        return action;
+    }
+
+    private void reRootTree(RiskState state) {
+        int currentNumberOfActions = root.getNode().getState().getGame().getActionRecords().size();
+        var actionRecords = state.getGame().getActionRecords();
+        Tree<Node> current = root;
+        for (int i = currentNumberOfActions; i < actionRecords.size(); i++) {
+            var action = actionRecords.get(i);
+            var playedBranch = current.getChildren().stream()
+                    .filter(c -> c.getNode().getAction().get().equals(action.getAction()))
+                    .findAny();
+            if (playedBranch.isPresent()) {
+                current = playedBranch.get();
+            } else {
+                this.root = new DoubleLinkedTree<>(NodeFactory.makeRoot(state));
+                return;
+            }
+        }
+        root.reRoot(current);
+        root.dropParent();
     }
 }

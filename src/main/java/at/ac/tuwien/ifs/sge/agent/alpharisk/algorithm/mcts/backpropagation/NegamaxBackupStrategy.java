@@ -9,8 +9,11 @@ public class NegamaxBackupStrategy implements BackpropagationStrategy {
         Tree<Node> current = leaf;
         while (current != null) {
             current.getNode().update(value);
-            current = current.getParent();
-            value = -value;
+            var parent = current.getParent();
+            if (parent != null && parent.getNode().getState().getCurrentPlayer() != current.getNode().getState().getCurrentPlayer()) {
+                value = 1 - value;
+            }
+            current = parent;
         }
         return null;
     }

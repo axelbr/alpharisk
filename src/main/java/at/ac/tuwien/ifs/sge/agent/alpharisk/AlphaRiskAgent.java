@@ -17,8 +17,7 @@ public class AlphaRiskAgent extends AbstractGameAgent<Risk, RiskAction> implemen
 {
     private Phase currentPhase;
     private ExecutorService executor = Executors.newCachedThreadPool();
-    MonteCarloTreeSearch search = new MonteCarloTreeSearch(new MonteCarloTreeSearch.HyperParameters());
-
+    private MonteCarloTreeSearch search = new MonteCarloTreeSearch(new MonteCarloTreeSearch.HyperParameters());
 
     public AlphaRiskAgent(final Logger log) {
         super(0.75, 5L, TimeUnit.SECONDS, log);
@@ -33,16 +32,17 @@ public class AlphaRiskAgent extends AbstractGameAgent<Risk, RiskAction> implemen
         super.setTimers(computationTime, timeUnit);
         currentPhase = currentPhase.update(game);
         RiskState initialState = new RiskState(game, currentPhase);
-        ExecutorService service = Executors.newCachedThreadPool();
-        Future<RiskAction> actionFuture = service.submit(() -> search.computeAction(initialState));
+        Future<RiskAction> actionFuture = executor.submit(() -> search.computeAction(initialState));
         RiskAction action;
         try {
-            action = actionFuture.get(nanosLeft(), TimeUnit.NANOSECONDS);
+            action = actionFuture.get((long) (computationTime*0.9), timeUnit);
         } catch (TimeoutException e) {
             action = search.getCurrentBestAction();
         } catch (ExecutionException | InterruptedException e) {
+            e.printStackTrace();
             throw new RuntimeException(e.getCause());
         }
+
         return action;
     }
 }
