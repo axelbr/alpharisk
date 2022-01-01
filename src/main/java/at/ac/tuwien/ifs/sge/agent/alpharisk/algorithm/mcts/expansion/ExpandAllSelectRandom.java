@@ -3,11 +3,11 @@ package at.ac.tuwien.ifs.sge.agent.alpharisk.algorithm.mcts.expansion;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.RiskState;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.algorithm.nodes.Node;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.algorithm.nodes.NodeFactory;
-import at.ac.tuwien.ifs.sge.game.risk.board.Risk;
 import at.ac.tuwien.ifs.sge.game.risk.board.RiskAction;
+import at.ac.tuwien.ifs.sge.util.Util;
 import at.ac.tuwien.ifs.sge.util.tree.Tree;
 
-public class DefaultExpansionStrategy implements ExpansionStrategy {
+public class ExpandAllSelectRandom implements ExpansionStrategy {
     @Override
     public Tree<Node> apply(Tree<Node> tree) {
         assert tree.isLeaf();
@@ -17,6 +17,6 @@ public class DefaultExpansionStrategy implements ExpansionStrategy {
             Node next = NodeFactory.makeNode(nextState, action);
             tree.add(next);
         }
-        return tree;
+        return Util.selectRandom(tree.getChildren());
     }
 }

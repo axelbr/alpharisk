@@ -30,8 +30,19 @@ public class AlphaRiskAgent extends AbstractGameAgent<Risk, RiskAction> implemen
     }
     
     public RiskAction computeNextAction(final Risk game, final long computationTime, final TimeUnit timeUnit) {
+        super.setTimers(computationTime, timeUnit);
         currentPhase = currentPhase.update(game);
         RiskState initialState = new RiskState(game, currentPhase);
-        return search.computeAction(initialState, computationTime, timeUnit);
+        ExecutorService service = Executors.newCachedThreadPool();
+        Future<RiskAction> actionFuture = service.submit(() -> search.computeAction(initialState));
+        RiskAction action;
+        try {
+            action = actionFuture.get(nanosLeft(), TimeUnit.NANOSECONDS);
+        } catch (TimeoutException e) {
+            action = search.getCurrentBestAction();
+        } catch (ExecutionException | InterruptedException e) {
+            throw new RuntimeException(e.getCause());
+        }
+        return action;
     }
 }

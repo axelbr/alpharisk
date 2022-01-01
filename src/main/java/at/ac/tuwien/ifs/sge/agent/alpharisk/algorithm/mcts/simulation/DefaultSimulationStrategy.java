@@ -1,4 +1,4 @@
-package at.ac.tuwien.ifs.sge.agent.alpharisk.algorithm.mcts.rollouts;
+package at.ac.tuwien.ifs.sge.agent.alpharisk.algorithm.mcts.simulation;
 
 import at.ac.tuwien.ifs.sge.agent.alpharisk.Phase;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.RiskState;
@@ -15,13 +15,13 @@ import org.apache.commons.math3.util.Pair;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class DefaultRolloutPolicy implements RolloutPolicy {
+public class DefaultSimulationStrategy implements SimulationStrategy {
 
     private final StoppingCriterion stoppingCriterion;
     private final Map<Phase, ActionSelectionHeuristic> heuristics;
     private StateUtilityHeuristic stateUtilityHeuristic;
 
-    public DefaultRolloutPolicy(Map<Phase, ActionSelectionHeuristic> heuristics, StateUtilityHeuristic stateUtilityHeuristic, StoppingCriterion stoppingCriterion) {
+    public DefaultSimulationStrategy(Map<Phase, ActionSelectionHeuristic> heuristics, StateUtilityHeuristic stateUtilityHeuristic, StoppingCriterion stoppingCriterion) {
         this.stoppingCriterion = stoppingCriterion;
         this.heuristics = heuristics;
         this.stateUtilityHeuristic = stateUtilityHeuristic;

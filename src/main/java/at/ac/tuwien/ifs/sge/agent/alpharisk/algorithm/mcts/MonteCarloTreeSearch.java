@@ -6,27 +6,23 @@ import at.ac.tuwien.ifs.sge.agent.alpharisk.algorithm.heuristics.selection.Borde
 import at.ac.tuwien.ifs.sge.agent.alpharisk.algorithm.heuristics.utility.MaximizeControlledTerritoriesHeuristic;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.algorithm.mcts.backpropagation.BackpropagationStrategy;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.algorithm.mcts.backpropagation.NegamaxBackupStrategy;
-import at.ac.tuwien.ifs.sge.agent.alpharisk.algorithm.mcts.expansion.DefaultExpansionStrategy;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.algorithm.mcts.expansion.ExpandAllSelectRandom;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.algorithm.mcts.expansion.ExpansionStrategy;
-import at.ac.tuwien.ifs.sge.agent.alpharisk.algorithm.mcts.rollouts.DefaultRolloutPolicy;
-import at.ac.tuwien.ifs.sge.agent.alpharisk.algorithm.mcts.rollouts.RolloutPolicy;
-import at.ac.tuwien.ifs.sge.agent.alpharisk.algorithm.mcts.selection.DefaultTreePolicy;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.algorithm.mcts.simulation.DefaultSimulationStrategy;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.algorithm.mcts.simulation.SimulationStrategy;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.algorithm.mcts.selection.UCTSelection;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.algorithm.mcts.selection.TreePolicy;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.algorithm.mcts.stoppingcriterions.MaxIterationsStoppingCriterion;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.algorithm.mcts.stoppingcriterions.StoppingCriterion;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.algorithm.nodes.Node;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.algorithm.nodes.NodeFactory;
-import at.ac.tuwien.ifs.sge.game.risk.board.Risk;
 import at.ac.tuwien.ifs.sge.game.risk.board.RiskAction;
 import at.ac.tuwien.ifs.sge.util.Util;
 import at.ac.tuwien.ifs.sge.util.tree.DoubleLinkedTree;
 import at.ac.tuwien.ifs.sge.util.tree.Tree;
 
-import java.time.Duration;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.*;
 
 public class MonteCarloTreeSearch {
@@ -37,26 +33,26 @@ public class MonteCarloTreeSearch {
     }
 
     private TreePolicy treePolicy;
-    private RolloutPolicy rolloutPolicy;
+    private SimulationStrategy simulationStrategy;
     private ExpansionStrategy expansionStrategy;
     private BackpropagationStrategy backpropagationStrategy;
     private RiskAction currentBestAction;
 
 
     public MonteCarloTreeSearch(HyperParameters parameters) {
-        this.treePolicy = new DefaultTreePolicy(parameters.explorationConstant);
-        this.rolloutPolicy = new DefaultRolloutPolicy(
+        this.treePolicy = new UCTSelection(parameters.explorationConstant);
+        this.simulationStrategy = new DefaultSimulationStrategy(
                 Map.of(Phase.REINFORCE, new BorderSecurityThreatHeuristic()),
                 new MaximizeControlledTerritoriesHeuristic(),
                 new MaxIterationsStoppingCriterion(parameters.maxIterations)
         );
-        this.expansionStrategy = new DefaultExpansionStrategy();
+        this.expansionStrategy = new ExpandAllSelectRandom();
         this.backpropagationStrategy = new NegamaxBackupStrategy();
     }
 
-    public MonteCarloTreeSearch(TreePolicy treePolicy, RolloutPolicy rolloutPolicy, ExpansionStrategy expansionStrategy, BackpropagationStrategy backpropagationStrategy) {
+    public MonteCarloTreeSearch(TreePolicy treePolicy, SimulationStrategy simulationStrategy, ExpansionStrategy expansionStrategy, BackpropagationStrategy backpropagationStrategy) {
         this.treePolicy = treePolicy;
-        this.rolloutPolicy = rolloutPolicy;
+        this.simulationStrategy = simulationStrategy;
         this.expansionStrategy = expansionStrategy;
         this.backpropagationStrategy = backpropagationStrategy;
     }
@@ -65,8 +61,8 @@ public class MonteCarloTreeSearch {
         this.treePolicy = treePolicy;
     }
 
-    public void setRolloutPolicy(RolloutPolicy rolloutPolicy) {
-        this.rolloutPolicy = rolloutPolicy;
+    public void setSimulationStrategy(SimulationStrategy simulationStrategy) {
+        this.simulationStrategy = simulationStrategy;
     }
 
     public void setExpansionStrategy(ExpansionStrategy expansionStrategy) {
@@ -81,8 +77,8 @@ public class MonteCarloTreeSearch {
         return treePolicy;
     }
 
-    public RolloutPolicy getRolloutPolicy() {
-        return rolloutPolicy;
+    public SimulationStrategy getSimulationStrategy() {
+        return simulationStrategy;
     }
 
     public ExpansionStrategy getExpansionStrategy() {
@@ -93,32 +89,22 @@ public class MonteCarloTreeSearch {
         return backpropagationStrategy;
     }
 
-    public RiskAction computeAction(RiskState state, long time, TimeUnit unit) {
-        ExecutorService executorService =  Executors.newCachedThreadPool();
-        var search = executorService.submit(() -> search(state, new MaxIterationsStoppingCriterion(128)));
-        RiskAction action;
-        try {
-            action = search.get(time, unit);
-        } catch (TimeoutException e) {
-            action = currentBestAction;
-        } catch (ExecutionException | InterruptedException e) {
-            throw new RuntimeException(e.getCause());
-        }
-        return action;
-    }
-
-    private RiskAction search(RiskState state, StoppingCriterion stoppingCriterion) {
+    public RiskAction computeAction(RiskState state) {
         Tree<Node> root = new DoubleLinkedTree<>(NodeFactory.makeRoot(state));
         var node = root;
         currentBestAction = Util.selectRandom(state.getGame().getPossibleActions());
-        stoppingCriterion.reset();
+        var stoppingCriterion = new MaxIterationsStoppingCriterion(128);
         while (!stoppingCriterion.shouldStop()) {
             node = treePolicy.apply(root);
             node = expansionStrategy.apply(node);
-            double value = rolloutPolicy.apply(node);
+            double value = simulationStrategy.apply(node);
             backpropagationStrategy.apply(node, value);
             currentBestAction = getBestAction(root, state.getCurrentPlayer());
         }
+        return currentBestAction;
+    }
+
+    public RiskAction getCurrentBestAction() {
         return currentBestAction;
     }
 

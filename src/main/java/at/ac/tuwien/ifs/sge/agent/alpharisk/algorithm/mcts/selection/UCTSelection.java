@@ -1,16 +1,15 @@
 package at.ac.tuwien.ifs.sge.agent.alpharisk.algorithm.mcts.selection;
 
-import at.ac.tuwien.ifs.sge.agent.alpharisk.algorithm.mcts.selection.TreePolicy;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.algorithm.nodes.Node;
 import at.ac.tuwien.ifs.sge.util.tree.Tree;
 
 import java.util.Comparator;
 
-public class DefaultTreePolicy implements TreePolicy {
+public class UCTSelection implements TreePolicy {
 
     private final double explorationConstant;
 
-    public DefaultTreePolicy(double explorationConstant) {
+    public UCTSelection(double explorationConstant) {
         this.explorationConstant = explorationConstant;
     }
 
