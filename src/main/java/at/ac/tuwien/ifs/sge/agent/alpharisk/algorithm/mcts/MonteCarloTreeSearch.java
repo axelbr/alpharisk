@@ -90,11 +90,7 @@ public class MonteCarloTreeSearch {
     }
 
     public RiskAction computeAction(RiskState state) {
-        if (root == null) {
-            root = new DoubleLinkedTree<>(NodeFactory.makeRoot(state));
-        } else {
-            reRootTree(state);
-        }
+        this.root = new DoubleLinkedTree<>(NodeFactory.makeRoot(state));
         currentBestAction = Util.selectRandom(state.getGame().getPossibleActions());
         var stoppingCriterion = new MaxIterationsStoppingCriterion(5000);
         while (!stoppingCriterion.shouldStop()) {

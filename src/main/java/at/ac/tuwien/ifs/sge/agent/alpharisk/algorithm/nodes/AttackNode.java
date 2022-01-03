@@ -17,4 +17,8 @@ public class AttackNode extends AbstractNode {
         possibleActions = state.getGame().getPossibleActions();
     }
 
+    @Override
+    public Set<RiskAction> getPossibleActions() {
+        return possibleActions;
+    }
 }

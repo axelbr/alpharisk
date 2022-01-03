@@ -16,7 +16,6 @@ import java.util.concurrent.*;
 public class AlphaRiskAgent extends AbstractGameAgent<Risk, RiskAction> implements GameAgent<Risk, RiskAction>
 {
     private Phase currentPhase;
-    private ExecutorService executor = Executors.newCachedThreadPool();
     private MonteCarloTreeSearch search = new MonteCarloTreeSearch(new MonteCarloTreeSearch.HyperParameters());
 
     public AlphaRiskAgent(final Logger log) {
@@ -32,6 +31,7 @@ public class AlphaRiskAgent extends AbstractGameAgent<Risk, RiskAction> implemen
         super.setTimers(computationTime, timeUnit);
         currentPhase = currentPhase.update(game);
         RiskState initialState = new RiskState(game, currentPhase);
+        ExecutorService executor = Executors.newCachedThreadPool();
         Future<RiskAction> actionFuture = executor.submit(() -> search.computeAction(initialState));
         RiskAction action;
         try {
@@ -40,7 +40,7 @@ public class AlphaRiskAgent extends AbstractGameAgent<Risk, RiskAction> implemen
             action = search.getCurrentBestAction();
         } catch (ExecutionException | InterruptedException e) {
             e.printStackTrace();
-            throw new RuntimeException(e.getCause());
+            throw new RuntimeException(e);
         }
 
         return action;

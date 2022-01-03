@@ -41,7 +41,7 @@ public class UCTSelection implements TreePolicy {
 
     private List<Tree<Node>> getChildren(Tree<Node> node) {
         return node.getChildren().stream()
-                .filter(c -> c.getNode().getState().getPhase() != Phase.TERMINATED)
+                .filter(c -> c != null && c.getNode().getState().getPhase() != Phase.TERMINATED)
                 .collect(Collectors.toList());
     }
 

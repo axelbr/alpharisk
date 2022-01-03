@@ -12,7 +12,7 @@ public class ExpandAllSelectRandom implements ExpansionStrategy {
     public Tree<Node> apply(Tree<Node> tree) {
         assert tree.isLeaf();
         Node node = tree.getNode();
-        for (RiskAction action: node.getState().getGame().getPossibleActions()) {
+        for (RiskAction action: node.getPossibleActions()) {
             RiskState nextState = node.getState().apply(action);
             Node next = NodeFactory.makeNode(nextState, action);
             tree.add(next);
