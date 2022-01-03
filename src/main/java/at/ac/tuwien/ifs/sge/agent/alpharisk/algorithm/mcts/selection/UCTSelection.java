@@ -25,9 +25,9 @@ public class UCTSelection implements TreePolicy {
             Tree<Node> bestChild = children.get(0);
             for (var child: children) {
                 double score = computeUpperConfidenceBound(child.getNode(), current.getNode(), explorationConstant);
-                if (child.getNode().getState().getCurrentPlayer() != node.getNode().getState().getCurrentPlayer()) {
+                /*if (child.getNode().getState().getCurrentPlayer() != node.getNode().getState().getCurrentPlayer()) {
                     score = -score;
-                }
+                }*/
                 if (score > bestScore) {
                     bestScore = score;
                     bestChild = child;

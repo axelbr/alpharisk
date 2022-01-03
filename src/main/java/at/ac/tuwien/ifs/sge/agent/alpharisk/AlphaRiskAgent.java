@@ -2,10 +2,15 @@ package at.ac.tuwien.ifs.sge.agent.alpharisk;
 
 import at.ac.tuwien.ifs.sge.agent.AbstractGameAgent;
 import at.ac.tuwien.ifs.sge.agent.GameAgent;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.algorithm.mcts.backpropagation.BackpropagationStrategy;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.algorithm.mcts.backpropagation.NegamaxBackupStrategy;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.algorithm.mcts.expansion.ExpandAllSelectRandom;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.algorithm.mcts.expansion.ExpandSingleNodeStrategy;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.algorithm.mcts.expansion.ExpansionStrategy;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.algorithm.mcts.selection.TreePolicy;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.algorithm.mcts.selection.UCTSelection;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.algorithm.mcts.simulation.RandomSimulationStrategy;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.algorithm.mcts.simulation.SimulationStrategy;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.algorithm.mcts.stoppingcriterions.MaxIterationsStoppingCriterion;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.algorithm.nodes.Node;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.algorithm.nodes.NodeFactory;
@@ -27,10 +32,10 @@ public class AlphaRiskAgent extends AbstractGameAgent<Risk, RiskAction> implemen
         public int maxIterations = 128;
     }
 
-    private final UCTSelection treePolicy;
-    private final RandomSimulationStrategy simulationStrategy;
-    private final ExpandSingleNodeStrategy expansionStrategy;
-    private final NegamaxBackupStrategy backpropagationStrategy;
+    private final TreePolicy treePolicy;
+    private final SimulationStrategy simulationStrategy;
+    private final ExpansionStrategy expansionStrategy;
+    private final BackpropagationStrategy backpropagationStrategy;
     private Phase currentPhase;
      private DoubleLinkedTree<Node> root;
 
@@ -39,7 +44,7 @@ public class AlphaRiskAgent extends AbstractGameAgent<Risk, RiskAction> implemen
         currentPhase = Phase.INITIAL_SELECT;
         this.treePolicy = new UCTSelection(new HyperParameters().explorationConstant);
         this.simulationStrategy = new RandomSimulationStrategy(new MaxIterationsStoppingCriterion(256));
-        this.expansionStrategy = new ExpandSingleNodeStrategy();
+        this.expansionStrategy = new ExpandAllSelectRandom();
         this.backpropagationStrategy = new NegamaxBackupStrategy();
     }
     
@@ -53,20 +58,25 @@ public class AlphaRiskAgent extends AbstractGameAgent<Risk, RiskAction> implemen
         RiskState initialState = new RiskState(game, currentPhase);
         this.root = new DoubleLinkedTree<>(NodeFactory.makeRoot(initialState));
         var currentBestAction = Util.selectRandom(game.getPossibleActions());
+        double value = 0;
+        int counter = 0;
         while (!this.shouldStopComputation()) {
             var node = treePolicy.apply(root);
             node = expansionStrategy.apply(node);
-            double value = simulationStrategy.apply(node);
+            value = simulationStrategy.apply(node);
             backpropagationStrategy.apply(node, value);
             currentBestAction = getBestAction(root, initialState.getCurrentPlayer());
+            counter++;
         }
+        log.warn("Expanded "+counter+" nodes.");
+        log.warn("Selected Action: "+currentBestAction+" with value "+value);
         return currentBestAction;
     }
 
     private RiskAction getBestAction(Tree<Node> node, int playerId) {
         var action = node.getChildren().stream()
                 .map(Tree::getNode)
-                .max(Comparator.comparingDouble(Node::getValue))
+                .max(Comparator.comparingDouble(n -> n.getValue()/n.getPlays()))
                 .orElseThrow()
                 .getAction()
                 .orElseThrow();

@@ -22,7 +22,6 @@ repositories {
     maven {
         url "https://repository.apache.org/snapshots"
     }
-    jcenter()
 }
 
 dependencies {
@@ -34,8 +33,6 @@ dependencies {
     implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.32'
     implementation group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.32'
 }
-
-project.configurations.implementation.setCanBeResolved(true)
 
 shadowJar {
     destinationDirectory = file('TestEnvironment/agents')
