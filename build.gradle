@@ -35,30 +35,11 @@ dependencies {
     implementation group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.32'
 }
 
-//serviceLoader {
-//    serviceInterface 'ai.djl.engine.EngineProvider'
-//}
 project.configurations.implementation.setCanBeResolved(true)
 
-jar {
-    manifest {
-        attributes 'Sge-Type': 'agent'
-        attributes 'Agent-Class': 'at.ac.tuwien.ifs.sge.agent.alpharisk.AlphaRiskAgent'
-        attributes 'Agent-Name': 'AlphaRiskAgent'
-    }
-}
-
-task uberJar(type: Jar) {
-    archiveClassifier = 'uber'
-
-    manifest {
-        attributes 'Sge-Type': 'agent'
-        attributes 'Agent-Class': 'at.ac.tuwien.ifs.sge.agent.alpharisk.AlphaRiskAgent'
-        attributes 'Agent-Name': 'AlphaRiskAgent'
-    }
-}
-
 shadowJar {
+    destinationDirectory = file('TestEnvironment/agents')
+
     manifest {
         attributes('Sge-Type': 'agent',
                 'Agent-Class': 'at.ac.tuwien.ifs.sge.agent.alpharisk.AlphaRiskAgent',
