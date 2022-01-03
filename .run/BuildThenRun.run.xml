@@ -1,0 +1,7 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="BuildThenRun" type="CompoundRunConfigurationType">
+    <toRun name="alpharisk [shadowJar]" type="GradleRunConfiguration" />
+    <toRun name="Run Match" type="JarApplication" />
+    <method v="2" />
+  </configuration>
+</component>
