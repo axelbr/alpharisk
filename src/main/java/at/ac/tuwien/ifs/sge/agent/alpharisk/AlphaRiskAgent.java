@@ -4,17 +4,17 @@ import java.util.concurrent.TimeUnit;
 
 import at.ac.tuwien.ifs.sge.agent.AbstractGameAgent;
 import at.ac.tuwien.ifs.sge.agent.GameAgent;
-import at.ac.tuwien.ifs.sge.agent.alpharisk.algorithm.mcts.backpropagation.BackpropagationStrategy;
-import at.ac.tuwien.ifs.sge.agent.alpharisk.algorithm.mcts.backpropagation.NegamaxBackupStrategy;
-import at.ac.tuwien.ifs.sge.agent.alpharisk.algorithm.mcts.expansion.ExpandAllSelectRandom;
-import at.ac.tuwien.ifs.sge.agent.alpharisk.algorithm.mcts.expansion.ExpansionStrategy;
-import at.ac.tuwien.ifs.sge.agent.alpharisk.algorithm.mcts.selection.TreePolicy;
-import at.ac.tuwien.ifs.sge.agent.alpharisk.algorithm.mcts.selection.UCTSelection;
-import at.ac.tuwien.ifs.sge.agent.alpharisk.algorithm.mcts.simulation.RandomSimulationStrategy;
-import at.ac.tuwien.ifs.sge.agent.alpharisk.algorithm.mcts.simulation.SimulationStrategy;
-import at.ac.tuwien.ifs.sge.agent.alpharisk.algorithm.mcts.stoppingcriterions.MaxIterationsStoppingCriterion;
-import at.ac.tuwien.ifs.sge.agent.alpharisk.algorithm.nodes.Node;
-import at.ac.tuwien.ifs.sge.agent.alpharisk.algorithm.nodes.NodeFactory;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.mcts.backpropagation.BackpropagationStrategy;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.mcts.backpropagation.NegamaxBackupStrategy;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.mcts.expansion.ExpandAllSelectRandom;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.mcts.expansion.ExpansionStrategy;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.mcts.selection.TreePolicy;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.mcts.selection.UCTSelection;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.mcts.simulation.RandomSimulationStrategy;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.mcts.simulation.SimulationStrategy;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.mcts.stoppingcriterions.MaxIterationsStoppingCriterion;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.nodes.Node;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.nodes.NodeFactory;
 import at.ac.tuwien.ifs.sge.engine.Logger;
 import at.ac.tuwien.ifs.sge.game.risk.board.Risk;
 import at.ac.tuwien.ifs.sge.game.risk.board.RiskAction;
@@ -25,8 +25,7 @@ import at.ac.tuwien.ifs.sge.util.tree.Tree;
 public class AlphaRiskAgent extends AbstractGameAgent<Risk, RiskAction> implements GameAgent<Risk, RiskAction> {
 
     public static class HyperParameters {
-        public static double explorationConstant = 2.0;
-        public static int numSimulations = 1;
+        public static double explorationConstant = 0.5;
         public static int maxDepth = 200;
     }
 
@@ -34,12 +33,12 @@ public class AlphaRiskAgent extends AbstractGameAgent<Risk, RiskAction> implemen
     private final SimulationStrategy simulationStrategy;
     private final ExpansionStrategy expansionStrategy;
     private final BackpropagationStrategy backpropagationStrategy;
-    private Phase currentPhase;
+    private RiskState.Phase currentPhase;
     private DoubleLinkedTree<Node> root;
 
     public AlphaRiskAgent(final Logger log) {
         super(0.75, 5L, TimeUnit.SECONDS, log);
-        currentPhase = Phase.INITIAL_SELECT;
+        currentPhase = RiskState.Phase.INITIAL_SELECT;
         this.treePolicy = new UCTSelection(HyperParameters.explorationConstant);
         this.simulationStrategy =
             new RandomSimulationStrategy(new MaxIterationsStoppingCriterion(HyperParameters.maxDepth));
@@ -55,27 +54,18 @@ public class AlphaRiskAgent extends AbstractGameAgent<Risk, RiskAction> implemen
         super.setTimers(computationTime, timeUnit);
         currentPhase = currentPhase.update(game);
         RiskState initialState = new RiskState(game, currentPhase);
-        //if (this.root == null) {
-            this.root = new DoubleLinkedTree<>(NodeFactory.makeRoot(initialState));
-        /*} else {
-            reRootTree(initialState);
-        }*/
+        this.root = new DoubleLinkedTree<>(NodeFactory.makeRoot(initialState));
         int counter = 0;
-        /*if (false && initialState.getPhase() != Phase.REINFORCE) {
-            return Util.selectRandom(game.getPossibleActions());
-        }*/
         while (!this.shouldStopComputation()) {
             var node = treePolicy.apply(root);
             node = expansionStrategy.apply(node);
             if (node != null) {
-                for (int i = 0; i < HyperParameters.numSimulations && !this.shouldStopComputation(); i++) {
-                    double value = simulationStrategy.apply(node);
-                    backpropagationStrategy.apply(node, value);
-                }
+                double value = simulationStrategy.apply(node);
+                backpropagationStrategy.apply(node, value);
                 counter++;
             }
         }
-        log.warn("Expanded " + counter + " nodes.");
+        log.info("Expanded " + counter + " nodes.");
         return getBestAction(root, initialState.getCurrentPlayer());
     }
 
@@ -92,14 +82,10 @@ public class AlphaRiskAgent extends AbstractGameAgent<Risk, RiskAction> implemen
                 max_value = val;
                 max_n = n;
             }
-            log.info(
-                "Action: " + n.getAction().orElseThrow() + " " + String.format("%.2f",val)
-                + " (" + String.format("%.2f",n.getValue()) + "/" + n.getPlays()
-                + " plays)");
+            log.info(String.format("Action: %s %.2f (%.2f/%d plays)", n.getAction().orElseThrow(), val, n.getValue(), n.getPlays()));
         }
         var action = max_n.getAction().orElseThrow();
-        log.warn("Best Action: " + action + " with value " + String.format("%.2f",max_value) + " (" + String.format("%.2f",max_n.getValue())+"/" + max_n
-            .getPlays() + " plays)");
+        log.info(String.format("Best Action: %s with value %.2f (%.2f/%d plays)", max_n.getAction().orElseThrow(), max_value, max_n.getValue(), max_n.getPlays()));
         return action;
     }
 
