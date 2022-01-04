@@ -19,66 +19,33 @@ sourcesJar {
 
 repositories {
     mavenCentral()
-    jcenter()
+    maven {
+        url "https://repository.apache.org/snapshots"
+    }
 }
 
 dependencies {
-    implementation group: 'at.ac.tuwien.ifs.sge', name: 'sge', version: '1.0.2'
-    implementation group: 'at.ac.tuwien.ifs.sge', name: 'sge-risk', version: '1.0.2'
-
-    implementation fileTree(dir: 'environment', include: ['*.jar'])
-
-    // https://mvnrepository.com/artifact/ai.djl/api
-    implementation group: 'ai.djl', name: 'api', version: '0.14.0'
-    implementation group: 'ai.djl', name: 'model-zoo', version: '0.14.0'
-    implementation group: 'ai.djl.pytorch', name: 'pytorch-engine', version: '0.14.0'
-    implementation group: 'ai.djl.pytorch', name: 'pytorch-native-auto', version: '1.9.1'
-
-    implementation group: 'org.javatuples', name: 'javatuples', version: '1.2';
-
-    // https://mvnrepository.com/artifact/org.jetbrains/annotations
-    implementation group: 'org.jetbrains', name: 'annotations', version: '23.0.0'
-    // https://mvnrepository.com/artifact/org.apache.commons/commons-math3
-    implementation group: 'org.apache.commons', name: 'commons-math3', version: '3.6.1'
-    // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
-    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.12.0'
-    // https://mvnrepository.com/artifact/commons-io/commons-io
-    implementation group: 'commons-io', name: 'commons-io', version: '2.11.0'
-    // https://mvnrepository.com/artifact/ca.umontreal.iro.simul/ssj
-    implementation group: 'ca.umontreal.iro.simul', name: 'ssj', version: '3.3.1'
-    // https://mvnrepository.com/artifact/org.apache.commons/commons-csv
-    implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.9.0'
-    // https://mvnrepository.com/artifact/org.slf4j/slf4j-api
+    //implementation group: 'at.ac.tuwien.ifs.sge', name: 'sge', version: '1.0.2'
+    //implementation group: 'at.ac.tuwien.ifs.sge', name: 'sge-risk', version: '1.0.2'
+    implementation fileTree(dir: 'TestEnvironment', include: ['*.jar'])
+    implementation("com.google.guava:guava:31.0.1-jre")
+    implementation 'org.apache.commons:commons-math3:3.6.1'
     implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.32'
-    // https://mvnrepository.com/artifact/org.slf4j/slf4j-simple
     implementation group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.32'
-
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
-    testImplementation 'org.junit.jupiter:junit-jupiter-params:5.8.1'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
-
-    compileOnly 'org.projectlombok:lombok:1.18.22'
-    annotationProcessor 'org.projectlombok:lombok:1.18.22'
 }
-
-test {
-    useJUnitPlatform()
-}
-
-project.configurations.implementation.setCanBeResolved(true)
 
 shadowJar {
+    destinationDirectory = file('TestEnvironment/agents')
+
     manifest {
-        attributes(
-                'Main-Class': 'at.ac.tuwien.ifs.sge.agent.alpharisk.training.Trainer',
-                'Sge-Type': 'agent',
+        attributes('Sge-Type': 'agent',
                 'Agent-Class': 'at.ac.tuwien.ifs.sge.agent.alpharisk.AlphaRiskAgent',
-                'Agent-Name': 'AlphaRisk')
+                'Agent-Name': 'AlphaRiskAgent')
     }
 
     exclude("at/ac/tuwien/ifs/sge/agent/alphabetaagent")
     exclude("at/ac/tuwien/ifs/sge/agent/mctsagent")
     exclude("at/ac/tuwien/ifs/sge/agent/randomagent")
     exclude("at/ac/tuwien/ifs/sge/agent/risk")
-    //minimize()
+    minimize()
 }
