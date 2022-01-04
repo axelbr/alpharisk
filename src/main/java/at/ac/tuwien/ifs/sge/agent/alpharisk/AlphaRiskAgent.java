@@ -29,7 +29,7 @@ public class AlphaRiskAgent extends AbstractGameAgent<Risk, RiskAction> implemen
 
     public static class HyperParameters {
         public double explorationConstant = 1.0;
-        public int maxIterations = 128;
+        public int maxPlayouts = 256;
     }
 
     private final TreePolicy treePolicy;
@@ -42,8 +42,9 @@ public class AlphaRiskAgent extends AbstractGameAgent<Risk, RiskAction> implemen
     public AlphaRiskAgent(final Logger log) {
         super(0.75, 5L, TimeUnit.SECONDS, log);
         currentPhase = Phase.INITIAL_SELECT;
-        this.treePolicy = new UCTSelection(new HyperParameters().explorationConstant);
-        this.simulationStrategy = new RandomSimulationStrategy(new MaxIterationsStoppingCriterion(256));
+        var params = new HyperParameters();
+        this.treePolicy = new UCTSelection(params.explorationConstant);
+        this.simulationStrategy = new RandomSimulationStrategy(new MaxIterationsStoppingCriterion(params.maxPlayouts));
         this.expansionStrategy = new ExpandAllSelectRandom();
         this.backpropagationStrategy = new NegamaxBackupStrategy();
     }
@@ -60,16 +61,21 @@ public class AlphaRiskAgent extends AbstractGameAgent<Risk, RiskAction> implemen
         var currentBestAction = Util.selectRandom(game.getPossibleActions());
         double value = 0;
         int counter = 0;
+        if (false && initialState.getPhase() != Phase.REINFORCE) {
+            return Util.selectRandom(game.getPossibleActions());
+        }
         while (!this.shouldStopComputation()) {
             var node = treePolicy.apply(root);
             node = expansionStrategy.apply(node);
-            value = simulationStrategy.apply(node);
-            backpropagationStrategy.apply(node, value);
-            currentBestAction = getBestAction(root, initialState.getCurrentPlayer());
+            if (node != null) {
+                value = simulationStrategy.apply(node);
+                backpropagationStrategy.apply(node, value);
+                currentBestAction = getBestAction(root, initialState.getCurrentPlayer());
+            }
             counter++;
         }
-        log.warn("Expanded "+counter+" nodes.");
-        log.warn("Selected Action: "+currentBestAction+" with value "+value);
+        log.info("Run " + counter + " iterations.");
+        log.inf("Selected Action: "+currentBestAction+" with value "+value);
         return currentBestAction;
     }
 

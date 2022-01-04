@@ -26,7 +26,7 @@ public class RandomSimulationStrategy implements SimulationStrategy {
         if (state.getPhase() == Phase.TERMINATED) {
             return state.getGame().getUtilityValue(initialState.getCurrentPlayer());
         } else {
-            return 0.0;
+            return (double) state.getGame().getBoard().getNrOfTerritoriesOccupiedByPlayer(state.getCurrentPlayer())/state.getGame().getBoard().getTerritories().size();
         }
     }
 }

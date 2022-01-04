@@ -10,10 +10,13 @@ public class NodeFactory {
         switch (state.getPhase()) {
             case INITIAL_SELECT:
             case INITIAL_REINFORCE:
-            case REINFORCE:
-            case OCCUPY:
-            case FORTIFY:
                 return new DefaultNode(state, action);
+            case REINFORCE:
+                return new ReinforceNode(state, action);
+            case FORTIFY:
+                return new FortifyNode(state, action);
+            case OCCUPY:
+                return new OccupyNode(state, action);
             case ATTACK:
                 return new AttackNode(state, action);
             case TERMINATED:
