@@ -87,6 +87,7 @@ public class RiskState {
         ATTACK("ATTACK"),
         OCCUPY("OCCUPY"),
         FORTIFY("FORTIFY"),
+        TRADE_IN("TRADE_IN"),
         TERMINATED("TERMINATED");
     
         private String name;
@@ -114,6 +115,8 @@ public class RiskState {
         private Phase updateDefault(Risk state) {
             if (state.isGameOver()) {
                 return Phase.TERMINATED;
+            } else if (state.getBoard().hasToTradeInCards(state.getCurrentPlayer())) {
+                return Phase.TRADE_IN;
             } else if (state.getBoard().isReinforcementPhase()) {
                 return Phase.REINFORCE;
             } else if (state.getBoard().isAttackPhase()) {

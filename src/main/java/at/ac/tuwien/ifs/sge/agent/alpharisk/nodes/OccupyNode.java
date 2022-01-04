@@ -18,7 +18,7 @@ public class OccupyNode extends AbstractNode {
                 .max(Integer::compare)
                 .orElseThrow();
         return super.getPossibleActions().stream()
-                .filter(a -> a.troops() == 3 || a.troops() == maxTroops)
+                .filter(a -> a.troops() == 3 || a.troops() == maxTroops || a.troops() == 1)
                 .collect(Collectors.toSet());
     }
 }

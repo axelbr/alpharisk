@@ -4,6 +4,7 @@ import at.ac.tuwien.ifs.sge.agent.alpharisk.RiskState;
 import at.ac.tuwien.ifs.sge.game.risk.board.RiskAction;
 
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class AttackNode extends AbstractNode {
 
@@ -11,7 +12,19 @@ public class AttackNode extends AbstractNode {
     private Set<RiskAction> possibleActions;
     public AttackNode(RiskState state, RiskAction previousAction) {
         super(state, previousAction);
-        possibleActions = state.getGame().getPossibleActions();
+        possibleActions = computeActions(state);
+    }
+
+    Set<RiskAction> computeActions(RiskState state) {
+        var board = state.getBoard();
+        var actions = super.getPossibleActions().stream()
+                .filter(a -> a.troops() == board.getMaxAttackingTroops(a.attackingId()) || a.isEndPhase() || a.isBonus())
+                .collect(Collectors.toSet());
+        if (actions.isEmpty()) {
+            return super.getPossibleActions();
+        } else {
+            return actions;
+        }
     }
 
     @Override

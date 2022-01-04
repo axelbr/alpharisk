@@ -10,6 +10,7 @@ public class NodeFactory {
         switch (state.getPhase()) {
             case INITIAL_SELECT:
             case INITIAL_REINFORCE:
+            case TRADE_IN:
                 return new DefaultNode(state, action);
             case REINFORCE:
                 return new ReinforceNode(state, action);

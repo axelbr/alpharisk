@@ -56,6 +56,7 @@ public class AlphaRiskAgent extends AbstractGameAgent<Risk, RiskAction> implemen
         RiskState initialState = new RiskState(game, currentPhase);
         this.root = new DoubleLinkedTree<>(NodeFactory.makeRoot(initialState));
         int counter = 0;
+        var action = Util.selectRandom(game.getPossibleActions());
         while (!this.shouldStopComputation()) {
             var node = treePolicy.apply(root);
             node = expansionStrategy.apply(node);
