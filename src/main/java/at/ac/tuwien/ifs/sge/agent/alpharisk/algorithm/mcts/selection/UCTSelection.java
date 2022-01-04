@@ -1,12 +1,12 @@
 package at.ac.tuwien.ifs.sge.agent.alpharisk.algorithm.mcts.selection;
 
-import at.ac.tuwien.ifs.sge.agent.alpharisk.Phase;
-import at.ac.tuwien.ifs.sge.agent.alpharisk.algorithm.nodes.Node;
-import at.ac.tuwien.ifs.sge.util.tree.Tree;
-
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import at.ac.tuwien.ifs.sge.agent.alpharisk.Phase;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.algorithm.nodes.Node;
+import at.ac.tuwien.ifs.sge.util.Util;
+import at.ac.tuwien.ifs.sge.util.tree.Tree;
 
 public class UCTSelection implements TreePolicy {
 
@@ -23,7 +23,7 @@ public class UCTSelection implements TreePolicy {
         while (!children.isEmpty()) {
             double bestScore = -Double.MAX_VALUE;
             Tree<Node> bestChild = children.get(0);
-            for (var child: children) {
+            for (var child : children) {
                 double score = computeUpperConfidenceBound(child.getNode(), current.getNode(), explorationConstant);
                 /*if (child.getNode().getState().getCurrentPlayer() != node.getNode().getState().getCurrentPlayer()) {
                     score = -score;
@@ -41,8 +41,8 @@ public class UCTSelection implements TreePolicy {
 
     private List<Tree<Node>> getChildren(Tree<Node> node) {
         return node.getChildren().stream()
-                .filter(c -> c != null && c.getNode().getState().getPhase() != Phase.TERMINATED)
-                .collect(Collectors.toList());
+            .filter(c -> c != null && c.getNode().getState().getPhase() != Phase.TERMINATED)
+            .collect(Collectors.toList());
     }
 
     private double computeUpperConfidenceBound(Node node, Node parent, double explorationConstant) {

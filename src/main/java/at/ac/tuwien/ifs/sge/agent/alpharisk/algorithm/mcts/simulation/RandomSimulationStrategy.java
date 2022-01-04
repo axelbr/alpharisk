@@ -27,6 +27,8 @@ public class RandomSimulationStrategy implements SimulationStrategy {
             return state.getGame().getUtilityValue(initialState.getCurrentPlayer());
         } else {
             return (double) state.getGame().getBoard().getNrOfTerritoriesOccupiedByPlayer(state.getCurrentPlayer())/state.getGame().getBoard().getTerritories().size();
+            /*return Math.random() < state.getGame().getHeuristicValue(initialState.getCurrentPlayer()) / state.getBoard()
+                .getTerritories().size() ? 1.0 : 0.0;*/
         }
     }
 }
