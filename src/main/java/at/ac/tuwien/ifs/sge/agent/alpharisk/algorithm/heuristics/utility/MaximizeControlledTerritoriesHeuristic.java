@@ -3,9 +3,9 @@ package at.ac.tuwien.ifs.sge.agent.alpharisk.algorithm.heuristics.utility;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.RiskState;
 
 public class MaximizeControlledTerritoriesHeuristic implements StateUtilityHeuristic {
-    @Override
-    public Double apply(RiskState state) {
+
+    public double calc(RiskState state, int playerID) {
         var board = state.getBoard();
-        return (double) board.getNrOfTerritoriesOccupiedByPlayer(state.getCurrentPlayer()) / board.getTerritories().size();
+        return (double) board.getNrOfTerritoriesOccupiedByPlayer(playerID) / board.getTerritories().size();
     }
 }

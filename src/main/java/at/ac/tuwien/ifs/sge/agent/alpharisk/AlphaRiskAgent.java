@@ -25,8 +25,9 @@ import at.ac.tuwien.ifs.sge.util.tree.Tree;
 public class AlphaRiskAgent extends AbstractGameAgent<Risk, RiskAction> implements GameAgent<Risk, RiskAction> {
 
     public static class HyperParameters {
-        public double explorationConstant = 1.0;
-        public int maxPlayouts = 256;
+        public static double explorationConstant = 2.0;
+        public static int numSimulations = 1;
+        public static int maxDepth = 200;
     }
 
     private final TreePolicy treePolicy;
@@ -39,9 +40,9 @@ public class AlphaRiskAgent extends AbstractGameAgent<Risk, RiskAction> implemen
     public AlphaRiskAgent(final Logger log) {
         super(0.75, 5L, TimeUnit.SECONDS, log);
         currentPhase = Phase.INITIAL_SELECT;
-        var params = new HyperParameters();
-        this.treePolicy = new UCTSelection(params.explorationConstant);
-        this.simulationStrategy = new RandomSimulationStrategy(new MaxIterationsStoppingCriterion(params.maxPlayouts));
+        this.treePolicy = new UCTSelection(HyperParameters.explorationConstant);
+        this.simulationStrategy =
+            new RandomSimulationStrategy(new MaxIterationsStoppingCriterion(HyperParameters.maxDepth));
         this.expansionStrategy = new ExpandAllSelectRandom();
         this.backpropagationStrategy = new NegamaxBackupStrategy();
     }
@@ -54,17 +55,23 @@ public class AlphaRiskAgent extends AbstractGameAgent<Risk, RiskAction> implemen
         super.setTimers(computationTime, timeUnit);
         currentPhase = currentPhase.update(game);
         RiskState initialState = new RiskState(game, currentPhase);
-        this.root = new DoubleLinkedTree<>(NodeFactory.makeRoot(initialState));
+        //if (this.root == null) {
+            this.root = new DoubleLinkedTree<>(NodeFactory.makeRoot(initialState));
+        /*} else {
+            reRootTree(initialState);
+        }*/
         int counter = 0;
-        if (false && initialState.getPhase() != Phase.REINFORCE) {
+        /*if (false && initialState.getPhase() != Phase.REINFORCE) {
             return Util.selectRandom(game.getPossibleActions());
-        }
+        }*/
         while (!this.shouldStopComputation()) {
             var node = treePolicy.apply(root);
             node = expansionStrategy.apply(node);
             if (node != null) {
-                double value = simulationStrategy.apply(node);
-                backpropagationStrategy.apply(node, value);
+                for (int i = 0; i < HyperParameters.numSimulations && !this.shouldStopComputation(); i++) {
+                    double value = simulationStrategy.apply(node);
+                    backpropagationStrategy.apply(node, value);
+                }
                 counter++;
             }
         }
@@ -73,18 +80,26 @@ public class AlphaRiskAgent extends AbstractGameAgent<Risk, RiskAction> implemen
     }
 
     private RiskAction getBestAction(Tree<Node> node, int playerId) {
+        if(node.getChildren().isEmpty()){return null;}
+
         Node n = node.getChild(0).getNode();
-        var action = n.getAction().orElseThrow();
-        var max_value = n.getValue() / n.getPlays();
+        Node max_n = n;
+        var max_value = -Double.MAX_VALUE;
         for (Tree<Node> child : node.getChildren()) {
             n = child.getNode();
-            var val = n.getValue() / n.getPlays();
+            var val = Util.percentage(n.getValue(), n.getPlays());
             if (val > max_value) {
                 max_value = val;
-                action = n.getAction().orElseThrow();
+                max_n = n;
             }
+            log.info(
+                "Action: " + n.getAction().orElseThrow() + " " + String.format("%.2f",val)
+                + " (" + String.format("%.2f",n.getValue()) + "/" + n.getPlays()
+                + " plays)");
         }
-        log.warn("Best Action: " + action + " with value " + max_value);
+        var action = max_n.getAction().orElseThrow();
+        log.warn("Best Action: " + action + " with value " + String.format("%.2f",max_value) + " (" + String.format("%.2f",max_n.getValue())+"/" + max_n
+            .getPlays() + " plays)");
         return action;
     }
 
@@ -95,7 +110,7 @@ public class AlphaRiskAgent extends AbstractGameAgent<Risk, RiskAction> implemen
         for (int i = currentNumberOfActions; i < actionRecords.size(); i++) {
             var action = actionRecords.get(i);
             var playedBranch = current.getChildren().stream()
-                .filter(c -> c.getNode().getAction().get().equals(action.getAction()))
+                .filter(c -> c.getNode().getAction().orElseThrow().equals(action.getAction()))
                 .findAny();
             if (playedBranch.isPresent()) {
                 current = playedBranch.get();
@@ -106,5 +121,6 @@ public class AlphaRiskAgent extends AbstractGameAgent<Risk, RiskAction> implemen
         }
         root.reRoot(current);
         root.dropParent();
+        log.debug("Rerooted tree with "+root.size()+" nodes.");
     }
 }

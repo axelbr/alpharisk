@@ -47,11 +47,7 @@ public class DefaultSimulationStrategy implements SimulationStrategy {
     }
 
     private Double computeValue(RiskState state, int playerId) {
-        double value = stateUtilityHeuristic.apply(state);
-        if (state.getCurrentPlayer() != playerId) {
-            return -value;
-        }
-        return value;
+        return stateUtilityHeuristic.calc(state, playerId);
     }
 
     private RiskAction determineAction(RiskState state) {

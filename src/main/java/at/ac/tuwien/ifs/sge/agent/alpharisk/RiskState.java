@@ -19,7 +19,7 @@ public class RiskState {
         this.risk = risk;
         this.phase = phase;
         if (phase == Phase.REINFORCE) {
-            this.availableTroops = computeBonus();
+            this.availableTroops = computeBonus(risk.getCurrentPlayer());
         }
     }
 
@@ -43,28 +43,24 @@ public class RiskState {
         return risk.getCurrentPlayer();
     }
 
-    private int computeBonus() {
-        if (phase == Phase.REINFORCE) {
+    public int computeBonus(int player) {
             var board = risk.getBoard();
-            int territoryBonus = board.getTerritoriesOccupiedByPlayer(risk.getCurrentPlayer()).size();
+            int territoryBonus = board.getTerritoriesOccupiedByPlayer(player).size();
             int contintentBonus = board.getContinentIds().stream()
-                    .filter(this::controlsContinent)
+                    .filter(c -> controlsContinent(c,player))
                     .map(board::getContinentBonus)
                     .reduce(0, Integer::sum);
-            int tradeInBonus = board.hasToTradeInCards(risk.getCurrentPlayer()) ? board.getTradeInBonus() : 0;
+            int tradeInBonus = board.hasToTradeInCards(player) ? board.getTradeInBonus() : 0;
             return Integer.max(3, territoryBonus / 3) + contintentBonus + tradeInBonus;
-        } else {
-            return 0;
-        }
     }
 
-    private boolean controlsContinent(int continentId) {
+    private boolean controlsContinent(int continentId, int player) {
         var board = risk.getBoard();
         var occupants = board.getTerritories().values().stream()
                 .filter(t -> t.getContinentId() == continentId)
                 .map(RiskTerritory::getOccupantPlayerId)
                 .collect(Collectors.toList());
-        boolean atLeastOneTerritory = occupants.stream().anyMatch(i -> i == risk.getCurrentPlayer());
+        boolean atLeastOneTerritory = occupants.stream().anyMatch(i -> i == player);
         boolean allTerritorriesSameOccupant = occupants.stream().distinct().count() == 1;
         return allTerritorriesSameOccupant && atLeastOneTerritory;
     }

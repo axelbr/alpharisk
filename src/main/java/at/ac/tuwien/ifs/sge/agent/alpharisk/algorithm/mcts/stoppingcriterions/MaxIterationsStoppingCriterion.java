@@ -1,7 +1,8 @@
 package at.ac.tuwien.ifs.sge.agent.alpharisk.algorithm.mcts.stoppingcriterions;
 
 public class MaxIterationsStoppingCriterion implements StoppingCriterion {
-    private int n, initialN;
+    private int n;
+    private final int initialN;
 
     public MaxIterationsStoppingCriterion(int n) {
         assert n > 0;
