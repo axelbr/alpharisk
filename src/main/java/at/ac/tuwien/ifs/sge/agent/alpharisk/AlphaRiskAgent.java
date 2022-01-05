@@ -27,7 +27,7 @@ public class AlphaRiskAgent extends AbstractGameAgent<Risk, RiskAction> implemen
     public static class HyperParameters {
         public static double explorationConstant = 2.0;
         public static int numSimulations = 1;
-        public static int maxDepth = 200;
+        public static int maxDepth = 100;
     }
 
     private final TreePolicy treePolicy;
@@ -64,7 +64,7 @@ public class AlphaRiskAgent extends AbstractGameAgent<Risk, RiskAction> implemen
         /*if (false && initialState.getPhase() != Phase.REINFORCE) {
             return Util.selectRandom(game.getPossibleActions());
         }*/
-        while (!this.shouldStopComputation()) {
+        while (!this.shouldStopComputation(2)) {
             var node = treePolicy.apply(root);
             node = expansionStrategy.apply(node);
             if (node != null) {
@@ -79,13 +79,15 @@ public class AlphaRiskAgent extends AbstractGameAgent<Risk, RiskAction> implemen
         return getBestAction(root, initialState.getCurrentPlayer());
     }
 
-    private RiskAction getBestAction(Tree<Node> node, int playerId) {
-        if(node.getChildren().isEmpty()){return null;}
+    private RiskAction getBestAction(Tree<Node> tree, int playerId) {
+        if(tree.getChildren().isEmpty()){
+            log.error("Node has no Children!");
+        }
 
-        Node n = node.getChild(0).getNode();
+        Node n = tree.getChild(0).getNode();
         Node max_n = n;
         var max_value = -Double.MAX_VALUE;
-        for (Tree<Node> child : node.getChildren()) {
+        for (Tree<Node> child : tree.getChildren()) {
             n = child.getNode();
             var val = Util.percentage(n.getValue(), n.getPlays());
             if (val > max_value) {

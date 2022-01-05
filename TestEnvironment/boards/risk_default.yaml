@@ -1,6 +1,6 @@
 !!at.ac.tuwien.ifs.sge.game.risk.configuration.RiskConfiguration
 cardTypesWithoutJoker: 3
-chooseInitialTerritories: true
+chooseInitialTerritories: false
 continents:
   - {continentId: 1, troopBonus: 2}
   - {continentId: 2, troopBonus: 5}

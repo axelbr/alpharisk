@@ -8,6 +8,6 @@ public class BonusRatioHeuristic implements StateUtilityHeuristic {
 
     public double calc(RiskState state, int playerID) {
         var board = state.getBoard();
-        return (double)state.computeBonus(playerID) / IntStream.range(0, board.getNumberOfPlayers()).map(state::computeBonus).sum();
+        return (double)state.computeTerritoryContinentBonus(playerID) / IntStream.range(0, board.getNumberOfPlayers()).map(state::computeTerritoryContinentBonus).sum();
     }
 }

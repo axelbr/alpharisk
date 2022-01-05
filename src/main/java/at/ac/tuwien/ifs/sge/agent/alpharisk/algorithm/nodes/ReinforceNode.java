@@ -29,6 +29,7 @@ public class ReinforceNode extends AbstractNode {
 
     @Override
     public Set<RiskAction> getPossibleActions() {
+        if(actions.isEmpty()) return super.getPossibleActions();
         return actions;
     }
 
