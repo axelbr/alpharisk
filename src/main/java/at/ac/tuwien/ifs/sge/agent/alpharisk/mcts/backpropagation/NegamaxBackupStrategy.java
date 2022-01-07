@@ -1,19 +1,18 @@
 package at.ac.tuwien.ifs.sge.agent.alpharisk.mcts.backpropagation;
 
-import at.ac.tuwien.ifs.sge.agent.alpharisk.nodes.Node;
-import at.ac.tuwien.ifs.sge.util.tree.Tree;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.tree.Node;
 
 public class NegamaxBackupStrategy implements BackpropagationStrategy {
+
     @Override
-    public Void apply(Tree<Node> leaf, Double value) {
-        Tree<Node> current = leaf;
-        int leafPlayerID = leaf.getNode().getState().getCurrentPlayer();
+    public Void apply(Node leaf, Double value) {
+        var current = leaf;
+        int leafPlayerID = leaf.getState().getCurrentPlayer();
         while (current != null) {
-            var node = current.getNode();
-            if (node.getState().getCurrentPlayer() == leafPlayerID) {
-                node.update(1);
+            if (current.getState().getCurrentPlayer() == leafPlayerID) {
+                current.update(1);
             } else {
-                node.update(1 - value);
+                current.update(1 - value);
             }
             current =  current.getParent();
         }

@@ -1,11 +1,10 @@
 package at.ac.tuwien.ifs.sge.agent.alpharisk.mcts.backpropagation;
 
-import at.ac.tuwien.ifs.sge.agent.alpharisk.nodes.Node;
-import at.ac.tuwien.ifs.sge.util.tree.Tree;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.tree.Node;
 
 import java.util.function.BiFunction;
 
-public interface BackpropagationStrategy extends BiFunction<Tree<Node>, Double, Void> {
+public interface BackpropagationStrategy extends BiFunction<Node, Double, Void> {
     @Override
-    Void apply(Tree<Node> leaf, Double value);
+    Void apply(Node leaf, Double value);
 }

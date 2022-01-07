@@ -6,23 +6,20 @@ import at.ac.tuwien.ifs.sge.agent.AbstractGameAgent;
 import at.ac.tuwien.ifs.sge.agent.GameAgent;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.mcts.backpropagation.BackpropagationStrategy;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.mcts.backpropagation.NegamaxBackupStrategy;
-import at.ac.tuwien.ifs.sge.agent.alpharisk.mcts.expansion.ExpandAllSelectRandom;
-import at.ac.tuwien.ifs.sge.agent.alpharisk.mcts.expansion.ExpansionStrategy;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.mcts.selection.TreePolicy;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.mcts.selection.UCTSelection;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.mcts.simulation.RandomSimulationStrategy;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.mcts.simulation.SimulationStrategy;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.mcts.stoppingcriterions.MaxIterationsStoppingCriterion;
-import at.ac.tuwien.ifs.sge.agent.alpharisk.nodes.Node;
-import at.ac.tuwien.ifs.sge.agent.alpharisk.nodes.NodeFactory;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.tree.NodeFactories;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.tree.Node;
 import at.ac.tuwien.ifs.sge.engine.Logger;
 import at.ac.tuwien.ifs.sge.game.risk.board.Risk;
 import at.ac.tuwien.ifs.sge.game.risk.board.RiskAction;
 import at.ac.tuwien.ifs.sge.util.Util;
-import at.ac.tuwien.ifs.sge.util.tree.DoubleLinkedTree;
-import at.ac.tuwien.ifs.sge.util.tree.Tree;
 
 public class AlphaRiskAgent extends AbstractGameAgent<Risk, RiskAction> implements GameAgent<Risk, RiskAction> {
+
 
     public static class HyperParameters {
         public static double explorationConstant = 0.5;
@@ -31,10 +28,9 @@ public class AlphaRiskAgent extends AbstractGameAgent<Risk, RiskAction> implemen
 
     private final TreePolicy treePolicy;
     private final SimulationStrategy simulationStrategy;
-    private final ExpansionStrategy expansionStrategy;
     private final BackpropagationStrategy backpropagationStrategy;
     private RiskState.Phase currentPhase;
-    private DoubleLinkedTree<Node> root;
+    private Node root;
 
     public AlphaRiskAgent(final Logger log) {
         super(0.75, 5L, TimeUnit.SECONDS, log);
@@ -42,8 +38,8 @@ public class AlphaRiskAgent extends AbstractGameAgent<Risk, RiskAction> implemen
         this.treePolicy = new UCTSelection(HyperParameters.explorationConstant);
         this.simulationStrategy =
             new RandomSimulationStrategy(new MaxIterationsStoppingCriterion(HyperParameters.maxDepth));
-        this.expansionStrategy = new ExpandAllSelectRandom();
         this.backpropagationStrategy = new NegamaxBackupStrategy();
+        NodeFactories.setTreePolicy(treePolicy);
     }
 
     public void setUp(final int numberOfPlayers, final int playerId) {
@@ -54,60 +50,59 @@ public class AlphaRiskAgent extends AbstractGameAgent<Risk, RiskAction> implemen
         super.setTimers(computationTime, timeUnit);
         currentPhase = currentPhase.update(game);
         RiskState initialState = new RiskState(game, currentPhase);
-        this.root = new DoubleLinkedTree<>(NodeFactory.makeRoot(initialState));
+        this.root = NodeFactories.decisionNodeFactory().makeRoot(initialState);
         int counter = 0;
-        var action = Util.selectRandom(game.getPossibleActions());
+
+        if (initialState.getPhase() == RiskState.Phase.INITIAL_REINFORCE || initialState.getPhase() == RiskState.Phase.INITIAL_SELECT) {
+            return Util.selectRandom(initialState.getGame().getPossibleActions());
+        }
+
         while (!this.shouldStopComputation()) {
-            var node = treePolicy.apply(root);
-            node = expansionStrategy.apply(node);
+            var node = select(root);
+            if (node == null) {
+                break;
+            }
+            node = node.expand();
             if (node != null) {
                 double value = simulationStrategy.apply(node);
                 backpropagationStrategy.apply(node, value);
-                counter++;
+
             }
+            counter++;
         }
-        log.info("Expanded " + counter + " nodes.");
+        log.info(String.format("Run %d iterations. Expanded nodes: %d.", counter, root.size()));
         return getBestAction(root, initialState.getCurrentPlayer());
     }
 
-    private RiskAction getBestAction(Tree<Node> node, int playerId) {
-        if(node.getChildren().isEmpty()){return null;}
+    private Node select(Node root) {
+        var current = root;
+        while (current != null && current.isFullyExpanded()) {
+            current = current.select();
+        }
+        return current;
+    }
 
-        Node n = node.getChild(0).getNode();
+    private RiskAction getBestAction(Node node, int playerId) {
+        if(node.isLeaf()){
+            return null;
+        }
+
+        Node n = null;
         Node max_n = n;
         var max_value = -Double.MAX_VALUE;
-        for (Tree<Node> child : node.getChildren()) {
-            n = child.getNode();
-            var val = Util.percentage(n.getValue(), n.getPlays());
+        for (var child : node.getChildren()) {
+            n = child;
+            var val = Util.percentage(n.getValue(), n.getVisits());
             if (val > max_value) {
                 max_value = val;
                 max_n = n;
             }
-            log.info(String.format("Action: %s %.2f (%.2f/%d plays)", n.getAction().orElseThrow(), val, n.getValue(), n.getPlays()));
+            log.info(String.format("Action: %s %.2f (%.2f/%d plays)", n.getAction().orElseThrow(), val, n.getValue(), n.getVisits()));
         }
         var action = max_n.getAction().orElseThrow();
-        log.info(String.format("Best Action: %s with value %.2f (%.2f/%d plays)", max_n.getAction().orElseThrow(), max_value, max_n.getValue(), max_n.getPlays()));
+        log.info(String.format("Best Action: %s with value %.2f (%.2f/%d plays)", max_n.getAction().orElseThrow(), max_value, max_n.getValue(), max_n.getVisits()));
         return action;
     }
 
-    private void reRootTree(RiskState state) {
-        int currentNumberOfActions = root.getNode().getState().getGame().getActionRecords().size();
-        var actionRecords = state.getGame().getActionRecords();
-        Tree<Node> current = root;
-        for (int i = currentNumberOfActions; i < actionRecords.size(); i++) {
-            var action = actionRecords.get(i);
-            var playedBranch = current.getChildren().stream()
-                .filter(c -> c.getNode().getAction().orElseThrow().equals(action.getAction()))
-                .findAny();
-            if (playedBranch.isPresent()) {
-                current = playedBranch.get();
-            } else {
-                this.root = new DoubleLinkedTree<>(NodeFactory.makeRoot(state));
-                return;
-            }
-        }
-        root.reRoot(current);
-        root.dropParent();
-        log.debug("Rerooted tree with "+root.size()+" nodes.");
-    }
+
 }

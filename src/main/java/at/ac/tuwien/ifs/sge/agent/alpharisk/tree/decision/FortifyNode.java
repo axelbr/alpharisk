@@ -1,16 +1,18 @@
-package at.ac.tuwien.ifs.sge.agent.alpharisk.nodes;
+package at.ac.tuwien.ifs.sge.agent.alpharisk.tree.decision;
 
 import at.ac.tuwien.ifs.sge.agent.alpharisk.RiskState;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.mcts.selection.TreePolicy;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.tree.Node;
 import at.ac.tuwien.ifs.sge.game.risk.board.RiskAction;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class FortifyNode extends AbstractNode {
+public class FortifyNode extends DecisionNode {
     private final Set<RiskAction> actions;
 
-    public FortifyNode(RiskState state, RiskAction previousAction) {
-        super(state, previousAction);
+    public FortifyNode(Node parent, RiskState state, RiskAction previousAction, TreePolicy treePolicy) {
+        super(parent, state, previousAction, treePolicy);
         this.actions = computeActions();
     }
 
@@ -21,8 +23,9 @@ public class FortifyNode extends AbstractNode {
 
     public Set<RiskAction> computeActions() {
         var board = getState().getBoard();
+        var possibleActions = getState().getGame().getPossibleActions();
         Map<Integer, Map<Integer, List<Integer>>> fortifications = new HashMap<>();
-        var frontFortifications = super.getPossibleActions().stream()
+        var frontFortifications = possibleActions.stream()
                 .filter(a -> a.fortifyingId() >= 0 && board.neighboringEnemyTerritories(a.fortifiedId()).size() > 0)
                 .collect(Collectors.toSet());
         for (var action: frontFortifications) {

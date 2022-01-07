@@ -43,6 +43,10 @@ public class RiskState {
         return risk.getCurrentPlayer();
     }
 
+    public boolean hasWon() {
+        return risk.getBoard().getNrOfTerritoriesOccupiedByPlayer(this.getCurrentPlayer()) > 0;
+    }
+
     public int computeBonus(int player) {
             var board = risk.getBoard();
             int territoryBonus = board.getTerritoriesOccupiedByPlayer(player).size();

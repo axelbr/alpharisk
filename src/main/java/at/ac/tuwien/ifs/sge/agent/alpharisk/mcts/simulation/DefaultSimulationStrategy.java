@@ -4,10 +4,9 @@ import at.ac.tuwien.ifs.sge.agent.alpharisk.RiskState;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.heuristics.selection.ActionSelectionHeuristic;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.heuristics.utility.StateUtilityHeuristic;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.mcts.stoppingcriterions.StoppingCriterion;
-import at.ac.tuwien.ifs.sge.agent.alpharisk.nodes.Node;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.tree.Node;
 import at.ac.tuwien.ifs.sge.game.risk.board.RiskAction;
 import at.ac.tuwien.ifs.sge.util.Util;
-import at.ac.tuwien.ifs.sge.util.tree.Tree;
 import org.apache.commons.math3.distribution.EnumeratedDistribution;
 import org.apache.commons.math3.util.Pair;
 
@@ -35,14 +34,14 @@ public class DefaultSimulationStrategy implements SimulationStrategy {
     }
 
     @Override
-    public Double apply(Tree<Node> tree) {
-        var state = tree.getNode().getState();
+    public Double apply(Node node) {
+        var state = node.getState();
         stoppingCriterion.reset();
         while (!stoppingCriterion.shouldStop() && state.getPhase() != RiskState.Phase.TERMINATED) {
             var action = determineAction(state);
             state = state.apply(action);
         }
-        return computeValue(state, tree.getNode().getState().getCurrentPlayer());
+        return computeValue(state, node.getState().getCurrentPlayer());
     }
 
     private Double computeValue(RiskState state, int playerId) {
