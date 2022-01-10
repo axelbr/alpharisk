@@ -36,7 +36,7 @@ public class UCTSelection implements TreePolicy {
             return Double.MAX_VALUE;
         } else {
             double explorationBonus = 2 * Math.sqrt(2 * Math.log(node.getParent().getVisits()) / node.getVisits());
-            return node.getValue() / node.getVisits() + explorationConstant * explorationBonus;
+            return node.getValue() + explorationConstant * explorationBonus;
         }
     }
 

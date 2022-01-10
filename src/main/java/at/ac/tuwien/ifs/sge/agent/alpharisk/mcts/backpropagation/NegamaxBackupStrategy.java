@@ -10,7 +10,7 @@ public class NegamaxBackupStrategy implements BackpropagationStrategy {
         int leafPlayerID = leaf.getState().getCurrentPlayer();
         while (current != null) {
             if (current.getState().getCurrentPlayer() == leafPlayerID) {
-                current.update(value);
+                current.update(1);
             } else {
                 current.update(1 - value);
             }

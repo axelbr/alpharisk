@@ -1,6 +1,8 @@
 package at.ac.tuwien.ifs.sge.agent.alpharisk;
 
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import at.ac.tuwien.ifs.sge.agent.AbstractGameAgent;
 import at.ac.tuwien.ifs.sge.agent.GameAgent;
@@ -86,22 +88,42 @@ public class AlphaRiskAgent extends AbstractGameAgent<Risk, RiskAction> implemen
         if(node.isLeaf()){
             return null;
         }
-
-        Node n = null;
-        Node max_n = n;
+        Node max_n = node;
         var max_value = -Double.MAX_VALUE;
         for (var child : node.getChildren()) {
-            n = child;
-            var val = Util.percentage(n.getValue(), n.getVisits());
-            if (val > max_value) {
-                max_value = val;
-                max_n = n;
+            if (child.getValue() > max_value) {
+                max_value = child.getValue();
+                max_n = child;
             }
-            log.info(String.format("Action: %s %.2f (%.2f/%d plays)", n.getAction().orElseThrow(), val, n.getValue(), n.getVisits()));
+            log.info(String.format("Action: %s, Value: %.2f, Visits: %d", child.getAction().orElseThrow(), child.getValue(), child.getVisits()));
         }
         var action = max_n.getAction().orElseThrow();
-        log.info(String.format("Best Action: %s with value %.2f (%.2f/%d plays)", max_n.getAction().orElseThrow(), max_value, max_n.getValue(), max_n.getVisits()));
+        log.info(String.format("Action: %s, Value: %.2f, Visits: %d", max_n.getAction().orElseThrow(), max_n.getValue(), max_n.getVisits()));
         return action;
+    }
+
+    private Node rerootTree(Node root, RiskState newState) {
+        Node newRoot = NodeFactories.decisionNodeFactory().makeRoot(newState);
+        if (root == null) {
+            return newRoot;
+        }
+        var actions = newState.getGame().getActionRecords().stream()
+                .skip(root.getState().getGame().getNumberOfActions())
+                .collect(Collectors.toList());
+        var current = root;
+        for (var action: actions) {
+            var selection = current.select(action.getAction());
+            if (selection.isPresent()) {
+                current = selection.get();
+            } else {
+                current = null;
+                break;
+            }
+        }
+        if (current != null) {
+            newRoot = current;
+        }
+        return newRoot;
     }
 
 

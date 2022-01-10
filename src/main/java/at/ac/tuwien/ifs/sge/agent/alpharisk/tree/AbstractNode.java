@@ -49,7 +49,7 @@ public abstract class AbstractNode implements Node {
 
     @Override
     public double getValue() {
-        return value;
+        return value / Math.max(visits, 1);
     }
 
     @Override

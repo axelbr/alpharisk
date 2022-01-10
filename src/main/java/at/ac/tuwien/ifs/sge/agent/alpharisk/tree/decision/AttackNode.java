@@ -50,7 +50,8 @@ public class AttackNode extends DecisionNode {
         var possibleActions = state.getGame().getPossibleActions();
         var board = state.getBoard();
         var actions = possibleActions.stream()
-                .filter(a -> a.troops() == board.getMaxAttackingTroops(a.attackingId()) || a.isEndPhase() || a.isBonus())
+                .filter(a -> (a.troops() == board.getMaxAttackingTroops(a.attackingId()) && PROBS[Math.min(2, board.getTerritoryTroops(a.defendingId()))][a.troops()] > 0.6)
+                        || a.isEndPhase() || a.isBonus())
                 .collect(Collectors.toSet());
         if (actions.isEmpty()) {
             return possibleActions;

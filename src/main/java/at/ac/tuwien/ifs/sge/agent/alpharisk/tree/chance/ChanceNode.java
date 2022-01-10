@@ -31,6 +31,11 @@ public abstract class ChanceNode extends AbstractNode {
     }
 
     @Override
+    public Optional<? extends Node> select(RiskAction action) {
+        return Optional.of(select());
+    }
+
+    @Override
     public Node expand() {
         return select();
     }

@@ -19,6 +19,7 @@ public interface Node {
 
 
     Node select();
+    Optional<? extends Node> select(RiskAction action);
     Node expand();
     void update(double value);
 

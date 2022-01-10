@@ -42,6 +42,11 @@ public abstract class DecisionNode extends AbstractNode {
         return treePolicy.apply(getChildren());
     }
 
+    @Override
+    public Optional<? extends Node> select(RiskAction action) {
+        return getChildren().stream().filter(c -> c.getAction().get().equals(action))
+                .findAny();
+    }
 
     @Override
     public boolean isFullyExpanded() {
