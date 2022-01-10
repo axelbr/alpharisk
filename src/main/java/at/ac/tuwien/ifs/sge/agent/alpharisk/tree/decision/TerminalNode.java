@@ -42,4 +42,8 @@ public class TerminalNode extends DecisionNode {
         return getState().hasWon() ? 1.0 : 0.0;
     }
 
+    @Override
+    public String toString() {
+        return String.format("Terminal(%s)", getState().hasWon() ? "win" : "loss");
+    }
 }

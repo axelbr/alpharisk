@@ -15,10 +15,13 @@ import at.ac.tuwien.ifs.sge.agent.alpharisk.mcts.simulation.SimulationStrategy;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.mcts.stoppingcriterions.MaxIterationsStoppingCriterion;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.tree.NodeFactories;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.tree.Node;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.tree.TreeVisualization;
 import at.ac.tuwien.ifs.sge.engine.Logger;
 import at.ac.tuwien.ifs.sge.game.risk.board.Risk;
 import at.ac.tuwien.ifs.sge.game.risk.board.RiskAction;
 import at.ac.tuwien.ifs.sge.util.Util;
+import at.ac.tuwien.ifs.sge.util.tree.Tree;
+import guru.nidi.graphviz.engine.Format;
 
 public class AlphaRiskAgent extends AbstractGameAgent<Risk, RiskAction> implements GameAgent<Risk, RiskAction> {
 
@@ -55,8 +58,8 @@ public class AlphaRiskAgent extends AbstractGameAgent<Risk, RiskAction> implemen
         this.root = NodeFactories.decisionNodeFactory().makeRoot(initialState);
         int counter = 0;
 
-        if (initialState.getPhase() == RiskState.Phase.INITIAL_REINFORCE || initialState.getPhase() == RiskState.Phase.INITIAL_SELECT) {
-            return Util.selectRandom(initialState.getGame().getPossibleActions());
+        if (initialState.getPhase() != RiskState.Phase.ATTACK) {
+           return Util.selectRandom(initialState.getGame().getPossibleActions());
         }
 
         while (!this.shouldStopComputation()) {
@@ -71,6 +74,7 @@ public class AlphaRiskAgent extends AbstractGameAgent<Risk, RiskAction> implemen
 
             }
             counter++;
+            TreeVisualization.save(root, String.format("./searchtree-%d.dot", counter), Format.DOT);
         }
         log.info(String.format("Run %d iterations. Expanded nodes: %d.", counter, root.size()));
         return getBestAction(root, initialState.getCurrentPlayer());

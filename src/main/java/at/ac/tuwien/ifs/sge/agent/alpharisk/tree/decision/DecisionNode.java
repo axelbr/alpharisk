@@ -14,10 +14,12 @@ public abstract class DecisionNode extends AbstractNode {
 
     private final TreePolicy treePolicy;
     private final NodeFactories.NodeFactory nodeFactory;
+    private final Set<RiskAction> untriedActions;
 
     public DecisionNode(Node parent, final RiskState state, RiskAction previousAction, TreePolicy treePolicy) {
         super(parent, state, previousAction);
         this.treePolicy = treePolicy;
+        untriedActions = state.getGame().getPossibleActions();
         nodeFactory = NodeFactories.decisionNodeFactory(treePolicy);
     }
 
@@ -29,12 +31,12 @@ public abstract class DecisionNode extends AbstractNode {
 
     @Override
     public Node expand() {
-        for (var action: getPossibleActions()) {
-            var nextState = getState().apply(action);
-            var node = nodeFactory.makeNode(this, nextState, action);
-            addChild(node);
-        }
-        return Util.selectRandom(getChildren());
+        var action = Util.selectRandom(untriedActions);
+        untriedActions.remove(action);
+        var nextState = getState().apply(action);
+        var node = nodeFactory.makeNode(this, nextState, action);
+        addChild(node);
+        return node;
     }
 
     @Override
@@ -50,6 +52,6 @@ public abstract class DecisionNode extends AbstractNode {
 
     @Override
     public boolean isFullyExpanded() {
-        return getPossibleActions().size() == getChildren().size();
+        return untriedActions.isEmpty();
     }
 }

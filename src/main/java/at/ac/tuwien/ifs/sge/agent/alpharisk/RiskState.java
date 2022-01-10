@@ -85,14 +85,14 @@ public class RiskState {
     }
 
     public enum Phase {
-        INITIAL_SELECT("INITIAL_SELECT"),
-        INITIAL_REINFORCE("INITIAL_REINFORCE"),
-        REINFORCE("REINFORCE"),
-        ATTACK("ATTACK"),
-        OCCUPY("OCCUPY"),
-        FORTIFY("FORTIFY"),
-        TRADE_IN("TRADE_IN"),
-        TERMINATED("TERMINATED");
+        INITIAL_SELECT("Initial Select"),
+        INITIAL_REINFORCE("Initial Reinforce"),
+        REINFORCE("Reinforce"),
+        ATTACK("Attack"),
+        OCCUPY("Occupy"),
+        FORTIFY("Fortify"),
+        TRADE_IN("Trade In"),
+        TERMINATED("Terminated");
     
         private String name;
     

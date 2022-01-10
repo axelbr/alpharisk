@@ -72,4 +72,10 @@ public abstract class AbstractNode implements Node {
         this.value += value;
         visits += 1;
     }
+
+    @Override
+    public String toString() {
+        return String.format("%s{%.2f, %d}", getState().getPhase(), this.getValue(), this.getVisits());
+    }
+
 }

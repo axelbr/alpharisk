@@ -22,10 +22,7 @@ public abstract class ChanceNode extends AbstractNode {
 
     @Override
     public Node select() {
-        var pairs = getChildren().stream()
-                .map(c -> Pair.create(c, getProbability(c.getState())))
-                .collect(Collectors.toList());
-        var pmf = new EnumeratedDistribution<>(pairs);
+        var pmf = new EnumeratedDistribution<>(children);
         var node = pmf.sample();
         return node;
     }
@@ -66,5 +63,10 @@ public abstract class ChanceNode extends AbstractNode {
     @Override
     public final boolean isFullyExpanded() {
         return true;
+    }
+
+    @Override
+    public String toString() {
+        return "Chance" + super.toString();
     }
 }

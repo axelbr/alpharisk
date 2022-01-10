@@ -24,4 +24,5 @@ public class OccupyNode extends DecisionNode {
                 .filter(a -> a.troops() == 3 || a.troops() == maxTroops || a.troops() == 1)
                 .collect(Collectors.toSet());
     }
+
 }

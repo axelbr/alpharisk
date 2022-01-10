@@ -4,6 +4,7 @@ import at.ac.tuwien.ifs.sge.agent.alpharisk.RiskState;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.tree.decision.DecisionNode;
 
 public class SearchTree {
+
     private Node root;
 
     public SearchTree(Node root) {

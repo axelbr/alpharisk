@@ -39,7 +39,7 @@ public class AttackNode extends DecisionNode {
             }
             addChild(node);
         }
-        return Util.selectRandom(getChildren());
+        return Util.selectRandom(getChildren()).select();
     }
 
     private boolean isAttackAction(RiskAction action) {
@@ -59,4 +59,5 @@ public class AttackNode extends DecisionNode {
             return actions;
         }
     }
+
 }

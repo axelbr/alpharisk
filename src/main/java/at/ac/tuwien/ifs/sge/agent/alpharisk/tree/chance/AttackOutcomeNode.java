@@ -108,12 +108,6 @@ public class AttackOutcomeNode extends ChanceNode {
         return select();
     }
 
-    @Override
-    public Node select() {
-        sampleAction();
-        return super.select();
-    }
-
     private void sampleAction() {
         var action = getAction().get();
         if (sampledOutcomes.size() < possibleOutcomes.size()) {
