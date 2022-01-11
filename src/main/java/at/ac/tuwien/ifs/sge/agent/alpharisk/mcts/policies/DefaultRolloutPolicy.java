@@ -1,9 +1,8 @@
-package at.ac.tuwien.ifs.sge.agent.alpharisk.mcts.simulation;
+package at.ac.tuwien.ifs.sge.agent.alpharisk.mcts.policies;
 
-import at.ac.tuwien.ifs.sge.agent.alpharisk.RiskState;
-import at.ac.tuwien.ifs.sge.agent.alpharisk.heuristics.selection.ActionSelectionHeuristic;
-import at.ac.tuwien.ifs.sge.agent.alpharisk.heuristics.utility.StateUtilityHeuristic;
-import at.ac.tuwien.ifs.sge.agent.alpharisk.mcts.stoppingcriterions.StoppingCriterion;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.domain.RiskState;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.mcts.heuristics.selection.ActionSelectionHeuristic;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.mcts.heuristics.utility.StateUtilityHeuristic;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.tree.Node;
 import at.ac.tuwien.ifs.sge.game.risk.board.RiskAction;
 import at.ac.tuwien.ifs.sge.util.Util;
@@ -13,14 +12,13 @@ import org.apache.commons.math3.util.Pair;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class DefaultSimulationStrategy implements SimulationStrategy {
+public class DefaultRolloutPolicy implements RolloutPolicy {
 
-    private final StoppingCriterion stoppingCriterion;
     private final Map<RiskState.Phase, ActionSelectionHeuristic> heuristics;
     private StateUtilityHeuristic stateUtilityHeuristic;
 
-    public DefaultSimulationStrategy(Map<RiskState.Phase, ActionSelectionHeuristic> heuristics, StateUtilityHeuristic stateUtilityHeuristic, StoppingCriterion stoppingCriterion) {
-        this.stoppingCriterion = stoppingCriterion;
+    public DefaultRolloutPolicy(Map<RiskState.Phase, ActionSelectionHeuristic> heuristics, StateUtilityHeuristic stateUtilityHeuristic) {
+
         this.heuristics = heuristics;
         this.stateUtilityHeuristic = stateUtilityHeuristic;
     }
@@ -34,14 +32,10 @@ public class DefaultSimulationStrategy implements SimulationStrategy {
     }
 
     @Override
-    public Double apply(Node node) {
-        var state = node.getState();
-        stoppingCriterion.reset();
-        while (!stoppingCriterion.shouldStop() && state.getPhase() != RiskState.Phase.TERMINATED) {
-            var action = determineAction(state);
-            state = state.apply(action);
-        }
-        return computeValue(state, node.getState().getCurrentPlayer());
+    public RiskAction selectAction(RiskState state) {
+        var current = state;
+
+        return null; //computeValue(state, node.getState().getCurrentPlayer());
     }
 
     private Double computeValue(RiskState state, int playerId) {

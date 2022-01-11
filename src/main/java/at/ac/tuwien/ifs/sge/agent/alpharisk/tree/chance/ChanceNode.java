@@ -1,8 +1,9 @@
 package at.ac.tuwien.ifs.sge.agent.alpharisk.tree.chance;
 
-import at.ac.tuwien.ifs.sge.agent.alpharisk.RiskState;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.domain.RiskState;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.tree.AbstractNode;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.tree.Node;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.tree.decision.DefaultDecisionNode;
 import at.ac.tuwien.ifs.sge.game.risk.board.RiskAction;
 import org.apache.commons.math3.distribution.EnumeratedDistribution;
 import org.apache.commons.math3.util.Pair;
@@ -13,28 +14,33 @@ import java.util.stream.Collectors;
 public abstract class ChanceNode extends AbstractNode {
 
     private List<Pair<Node, Double>> children = new ArrayList<>();
+    private int visits;
 
     public ChanceNode(Node parent, RiskState state, RiskAction action) {
         super(parent, state, action);
     }
 
     public abstract double getProbability(RiskState outcome);
+    protected abstract boolean isAlreadySampled(Node node);
+    public abstract Node sampleOutcome();
 
     @Override
-    public Node select() {
-        var pmf = new EnumeratedDistribution<>(children);
-        var node = pmf.sample();
-        return node;
+    public Node select(RiskAction action) {
+        if (isFullyExpanded()) {
+            var pmf = new EnumeratedDistribution<>(children);
+            return pmf.sample();
+        } else {
+            var node = sampleOutcome();
+            if (!isAlreadySampled(node)) {
+                addChild(node);
+            }
+            return node;
+        }
     }
 
     @Override
-    public Optional<? extends Node> select(RiskAction action) {
-        return Optional.of(select());
-    }
-
-    @Override
-    public Node expand() {
-        return select();
+    public Node expand(RiskAction action) {
+        return select(null);
     }
 
     @Override
@@ -51,8 +57,13 @@ public abstract class ChanceNode extends AbstractNode {
     }
 
     @Override
-    public Collection<? extends Node> getChildren() {
+    public Collection<? extends Node> expandedChildren() {
         return children.stream().map(Pair::getKey).collect(Collectors.toList());
+    }
+
+    @Override
+    public Set<RiskAction> expandedActions() {
+        return Set.of(getAction());
     }
 
     @Override
@@ -60,13 +71,21 @@ public abstract class ChanceNode extends AbstractNode {
         return false;
     }
 
-    @Override
-    public final boolean isFullyExpanded() {
-        return true;
-    }
+
 
     @Override
     public String toString() {
         return "Chance" + super.toString();
+    }
+
+    @Override
+    public int getVisits() {
+        return visits;
+    }
+
+    @Override
+    public void update(double value) {
+        visits += 1;
+        getParent().update(getValue());
     }
 }

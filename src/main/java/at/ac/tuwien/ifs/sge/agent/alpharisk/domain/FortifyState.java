@@ -1,29 +1,22 @@
-package at.ac.tuwien.ifs.sge.agent.alpharisk.tree.decision;
+package at.ac.tuwien.ifs.sge.agent.alpharisk.domain;
 
-import at.ac.tuwien.ifs.sge.agent.alpharisk.RiskState;
-import at.ac.tuwien.ifs.sge.agent.alpharisk.mcts.selection.TreePolicy;
-import at.ac.tuwien.ifs.sge.agent.alpharisk.tree.Node;
+import at.ac.tuwien.ifs.sge.game.risk.board.Risk;
 import at.ac.tuwien.ifs.sge.game.risk.board.RiskAction;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class FortifyNode extends DecisionNode {
+public class FortifyState extends RiskState {
     private final Set<RiskAction> actions;
 
-    public FortifyNode(Node parent, RiskState state, RiskAction previousAction, TreePolicy treePolicy) {
-        super(parent, state, previousAction, treePolicy);
-        this.actions = computeActions();
+    public FortifyState(Risk risk, Phase phase) {
+        super(risk, phase);
+        this.actions = computeActions(risk);
     }
 
-    @Override
-    public Set<RiskAction> getPossibleActions() {
-        return actions;
-    }
-
-    public Set<RiskAction> computeActions() {
-        var board = getState().getBoard();
-        var possibleActions = getState().getGame().getPossibleActions();
+    public Set<RiskAction> computeActions(Risk state) {
+        var board = state.getBoard();
+        var possibleActions = state.getPossibleActions();
         Map<Integer, Map<Integer, List<Integer>>> fortifications = new HashMap<>();
         var frontFortifications = possibleActions.stream()
                 .filter(a -> a.fortifyingId() >= 0 && board.neighboringEnemyTerritories(a.fortifiedId()).size() > 0)
@@ -54,5 +47,8 @@ public class FortifyNode extends DecisionNode {
         return actions;
     }
 
-
+    @Override
+    public Set<RiskAction> getPossibleActions() {
+        return actions;
+    }
 }

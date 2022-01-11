@@ -1,39 +1,29 @@
-package at.ac.tuwien.ifs.sge.agent.alpharisk.tree.decision;
+package at.ac.tuwien.ifs.sge.agent.alpharisk.domain;
 
-import at.ac.tuwien.ifs.sge.agent.alpharisk.RiskState;
-import at.ac.tuwien.ifs.sge.agent.alpharisk.mcts.selection.TreePolicy;
-import at.ac.tuwien.ifs.sge.agent.alpharisk.tree.Node;
+import at.ac.tuwien.ifs.sge.game.risk.board.Risk;
 import at.ac.tuwien.ifs.sge.game.risk.board.RiskAction;
 
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class ReinforceNode extends DecisionNode {
-
-    private final Set<RiskAction> actions;
+public class ReinforceState extends RiskState{
+    private Set<RiskAction> possibleActions;
     private Function<List<Integer>, List<Integer>> denomination;
-    private Set<Integer> blockingTerritories = new HashSet<>();
+    private Set<Integer> blockingTerritories;
 
-    public ReinforceNode(Node parent, RiskState state, RiskAction previousAction, TreePolicy treePolicy) {
-        this(parent, state, previousAction, treePolicy, (List<Integer> a) -> List.of(a.stream().max(Integer::compare).get()), new HashSet<>());
-    }
-
-    public ReinforceNode(Node parent, RiskState state, RiskAction previousAction, TreePolicy treePolicy, Function<List<Integer>, List<Integer>> denomination, Set<Integer> blockingTerritories) {
-        super(parent, state, previousAction, treePolicy);
+    public ReinforceState(Risk risk, Phase phase, Function<List<Integer>, List<Integer>> denomination, Set<Integer> blockingTerritories) {
+        super(risk, phase);
         this.denomination = denomination;
-        if (blockingTerritories != null) {
-            this.blockingTerritories.addAll(blockingTerritories);
-        }
-        this.actions = computePossibleActions(state);
+        this.blockingTerritories = blockingTerritories;
+        possibleActions = computePossibleActions(risk);
     }
 
-    @Override
-    public Set<RiskAction> getPossibleActions() {
-        return actions;
+    public ReinforceState(Risk risk, Phase phase) {
+        this(risk, phase, (List<Integer> a) -> List.of(a.stream().max(Integer::compare).get()), new HashSet<>());
     }
 
-    private Set<RiskAction> computePossibleActions(RiskState state) {
+    private Set<RiskAction> computePossibleActions(Risk state) {
         var board = state.getBoard();
         Map<Integer, List<Integer>> reinforcements = new HashMap<>();
         var possibleActions = state.getGame().getPossibleActions();
@@ -60,5 +50,8 @@ public class ReinforceNode extends DecisionNode {
         }
     }
 
-
+    @Override
+    public Set<RiskAction> getPossibleActions() {
+        return possibleActions;
+    }
 }

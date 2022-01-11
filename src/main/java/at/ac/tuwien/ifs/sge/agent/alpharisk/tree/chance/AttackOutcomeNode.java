@@ -1,9 +1,11 @@
 package at.ac.tuwien.ifs.sge.agent.alpharisk.tree.chance;
 
-import at.ac.tuwien.ifs.sge.agent.alpharisk.RiskState;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.domain.RiskState;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.tree.Node;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.tree.NodeFactories;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.tree.decision.DefaultDecisionNode;
 import at.ac.tuwien.ifs.sge.game.risk.board.RiskAction;
+import com.google.common.collect.Sets;
 
 import java.util.*;
 
@@ -92,39 +94,14 @@ public class AttackOutcomeNode extends ChanceNode {
 
     public AttackOutcomeNode(Node parent, RiskState state, RiskAction action) {
         super(parent, state, action);
-        int territoryTroops = this.getState().getGame().getBoard().getTerritoryTroops(getAction().get().defendingId());
+        int territoryTroops = this.getState().getGame().getBoard().getTerritoryTroops(getAction().defendingId());
         int defendingTroops = Math.min(2, territoryTroops);
-        var outcomes = Outcome.getPossibleOutcomes(getAction().get().troops(), defendingTroops);
+        var outcomes = Outcome.getPossibleOutcomes(getAction().troops(), defendingTroops);
         possibleOutcomes.addAll(outcomes);
-        sampleAction();
-        sampleAction();
-        sampleAction();
     }
-
-
-    @Override
-    public Node expand() {
-        sampleAction();
-        return select();
-    }
-
-    private void sampleAction() {
-        var action = getAction().get();
-        if (sampledOutcomes.size() < possibleOutcomes.size()) {
-
-            RiskState sampledState = getState().apply(this.getAction().get());
-            var outcome = computeOutcome(getState(), sampledState);
-            if (!sampledOutcomes.contains(outcome)) {
-                sampledOutcomes.add(outcome);
-                var node = NodeFactories.decisionNodeFactory().makeNode(getParent(), sampledState, action);
-                addChild(node);
-            }
-        }
-    }
-
 
     private Outcome computeOutcome(RiskState state, RiskState nextState) {
-        var action = getAction().get();
+        var action = getAction();
         int defendingTroops = this.getState().getGame().getBoard().getTerritoryTroops(action.defendingId());
         int defendingLoss = defendingTroops - nextState.getGame().getBoard().getTerritoryTroops(action.defendingId());
         int attackLoss = state.getGame().getBoard().getTerritoryTroops(action.attackingId()) - nextState.getGame().getBoard().getTerritoryTroops(action.attackingId());
@@ -139,5 +116,27 @@ public class AttackOutcomeNode extends ChanceNode {
     @Override
     public double getProbability(RiskState nextState) {
         return computeOutcome(getState(), nextState).probability;
+    }
+
+    @Override
+    protected boolean isAlreadySampled(Node node) {
+        var outcome = computeOutcome(getState(), node.getState());
+        return sampledOutcomes.contains(outcome);
+    }
+
+    @Override
+    public Node sampleOutcome() {
+        var action = getAction();
+        var nextState = getState().apply(action);
+        if (nextState.getPhase() == RiskState.Phase.ATTACK) {
+            return new AttackOutcomeNode(this, nextState, action);
+        } else {
+            return new DefaultDecisionNode(this, nextState, action);
+        }
+    }
+
+    @Override
+    public boolean isFullyExpanded() {
+        return possibleOutcomes.size() == sampledOutcomes.size();
     }
 }

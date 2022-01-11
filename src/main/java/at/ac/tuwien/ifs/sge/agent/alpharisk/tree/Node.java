@@ -1,30 +1,30 @@
 package at.ac.tuwien.ifs.sge.agent.alpharisk.tree;
 
-import at.ac.tuwien.ifs.sge.agent.alpharisk.RiskState;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.domain.RiskState;
 import at.ac.tuwien.ifs.sge.game.risk.board.RiskAction;
 
 import java.util.Collection;
-import java.util.Optional;
+import java.util.Set;
 
 public interface Node {
-    Optional<RiskAction> getAction();
+    RiskAction getAction();
     RiskState getState();
     Node getParent();
-    Collection<? extends Node> getChildren();
-    void addChild(Node node);
     double getValue();
     int getVisits();
 
+    Collection<? extends Node> expandedChildren();
+    Set<RiskAction> expandedActions();
+
     int size();
 
-
-    Node select();
-    Optional<? extends Node> select(RiskAction action);
-    Node expand();
+    Node select(RiskAction action);
+    Node expand(RiskAction action);
     void update(double value);
+    void addChild(Node node);
 
     default boolean isLeaf() {
-        return getChildren().isEmpty();
+        return expandedChildren().isEmpty();
     }
     boolean isFullyExpanded();
     default boolean isRoot() {

@@ -1,10 +1,10 @@
-package at.ac.tuwien.ifs.sge.agent.alpharisk.tree;
+package at.ac.tuwien.ifs.sge.agent.alpharisk.visualization;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.tree.Node;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.tree.chance.ChanceNode;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.tree.decision.DecisionNode;
 import guru.nidi.graphviz.attribute.*;
 import guru.nidi.graphviz.engine.Format;
 import guru.nidi.graphviz.engine.Graphviz;
-import guru.nidi.graphviz.model.Link;
 import guru.nidi.graphviz.model.MutableGraph;
 import guru.nidi.graphviz.model.MutableNode;
 
@@ -55,7 +55,7 @@ public class TreeVisualization {
             return toGraphNode(node);
         } else {
             var graphNode = toGraphNode(node);
-            for (var child: node.getChildren()) {
+            for (var child: node.expandedChildren()) {
                 graphNode.addLink(to(buildGraph(child)).add(edgeLabel(node, child)));
 
             }
@@ -79,7 +79,7 @@ public class TreeVisualization {
     }
 
     private static Attributes<ForAll> edgeLabel(DecisionNode parent, Node child) {
-        return Attributes.attrs(Label.of(child.getAction().get().toString()));
+        return Attributes.attrs(Label.of(child.getAction().toString()));
     }
 
     private static MutableNode toGraphNode(Node node) {
@@ -94,7 +94,7 @@ public class TreeVisualization {
     }
 
     private static String getLabel(Node node) {
-        String label = String.format("%s@%s", node, Integer.toHexString(node.hashCode()));
+        String label = String.format("%s{V: %.2f, N: %d}@%s", node, node.getValue(), node.getVisits(), Integer.toHexString(node.hashCode()));
         return label;
     }
 }

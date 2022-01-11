@@ -1,6 +1,6 @@
-package at.ac.tuwien.ifs.sge.agent.alpharisk.heuristics.selection;
+package at.ac.tuwien.ifs.sge.agent.alpharisk.mcts.heuristics.selection;
 
-import at.ac.tuwien.ifs.sge.agent.alpharisk.RiskState;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.domain.RiskState;
 import at.ac.tuwien.ifs.sge.game.risk.board.RiskAction;
 import org.apache.commons.math3.util.Pair;
 
@@ -26,7 +26,7 @@ public class BorderSecurityThreatHeuristic implements ActionSelectionHeuristic {
         }
         var highRiskTerritory = borderSecurityRatio.stream().max(Comparator.comparingDouble(Pair::getValue)).get();
         double normalizedThreat = highRiskTerritory.getValue() / sum;
-        int troops = (int) (normalizedThreat * state.getAvailableTroops());
+        int troops = 0; // (int) (normalizedThreat * state.getAvailableTroops());
         var action = RiskAction.reinforce(highRiskTerritory.getKey(), Math.max(troops, 1));
         return action;
     }

@@ -1,6 +1,6 @@
-package at.ac.tuwien.ifs.sge.agent.alpharisk.heuristics.utility;
+package at.ac.tuwien.ifs.sge.agent.alpharisk.mcts.heuristics.utility;
 
-import at.ac.tuwien.ifs.sge.agent.alpharisk.RiskState;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.domain.RiskState;
 
 public class MaximizeControlledTerritoriesHeuristic implements StateUtilityHeuristic {
 

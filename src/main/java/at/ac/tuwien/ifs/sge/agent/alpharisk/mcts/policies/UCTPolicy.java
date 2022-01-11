@@ -1,34 +1,34 @@
-package at.ac.tuwien.ifs.sge.agent.alpharisk.mcts.selection;
+package at.ac.tuwien.ifs.sge.agent.alpharisk.mcts.policies;
 
-import java.util.Collection;
 import java.util.stream.Collectors;
 
-import at.ac.tuwien.ifs.sge.agent.alpharisk.RiskState;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.domain.RiskState;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.tree.Node;
+import at.ac.tuwien.ifs.sge.game.risk.board.RiskAction;
 
-public class UCTSelection implements TreePolicy {
+public class UCTPolicy implements TreePolicy {
 
     private final double explorationConstant;
 
-    public UCTSelection(double explorationConstant) {
+    public UCTPolicy(double explorationConstant) {
         this.explorationConstant = explorationConstant;
     }
 
     @Override
-    public Node apply(Collection<? extends Node> nodes) {
+    public RiskAction selectAction(Node node) {
         double bestScore = -Double.MAX_VALUE;
-        Node bestChild = null;
-        var nonTerminalNodes = nodes.stream()
+        RiskAction bestAction = null;
+        var nonTerminalNodes = node.expandedChildren().stream()
                 .filter(c -> c != null && c.getState().getPhase() != RiskState.Phase.TERMINATED)
                 .collect(Collectors.toList());
         for (var child : nonTerminalNodes) {
             double score = computeUpperConfidenceBound(child, explorationConstant);
             if (score > bestScore) {
                 bestScore = score;
-                bestChild = child;
+                bestAction = child.getAction();
             }
         }
-        return bestChild;
+        return bestAction;
     }
 
     private double computeUpperConfidenceBound(Node node, double explorationConstant) {

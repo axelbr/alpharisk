@@ -1,6 +1,6 @@
 package at.ac.tuwien.ifs.sge.agent.alpharisk.tree;
 
-import at.ac.tuwien.ifs.sge.agent.alpharisk.RiskState;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.domain.RiskState;
 import at.ac.tuwien.ifs.sge.game.risk.board.RiskAction;
 
 import java.util.ArrayList;
@@ -24,12 +24,8 @@ public abstract class AbstractNode implements Node {
     }
 
     @Override
-    public Optional<RiskAction> getAction() {
-        if (action == null) {
-            return Optional.empty();
-        } else {
-            return Optional.of(action);
-        }
+    public RiskAction getAction() {
+        return action;
     }
 
     @Override
@@ -43,13 +39,13 @@ public abstract class AbstractNode implements Node {
     }
 
     @Override
-    public Collection<? extends Node> getChildren() {
+    public Collection<? extends Node> expandedChildren() {
         return children;
     }
 
     @Override
     public double getValue() {
-        return value / Math.max(visits, 1);
+        return visits > 0 ? value / visits : value;
     }
 
     @Override
@@ -71,11 +67,18 @@ public abstract class AbstractNode implements Node {
     public void update(double value) {
         this.value += value;
         visits += 1;
+        if (parent != null) {
+            if (parent.getState().getCurrentPlayer() != state.getCurrentPlayer()) {
+                parent.update(1.0 - value);
+            } else {
+                parent.update(value);
+            }
+        }
     }
 
     @Override
     public String toString() {
-        return String.format("%s{%.2f, %d}", getState().getPhase(), this.getValue(), this.getVisits());
+        return getState().getPhase().toString();
     }
 
 }
