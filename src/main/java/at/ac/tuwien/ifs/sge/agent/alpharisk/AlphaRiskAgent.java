@@ -5,13 +5,12 @@ import java.util.function.Function;
 
 import at.ac.tuwien.ifs.sge.agent.AbstractGameAgent;
 import at.ac.tuwien.ifs.sge.agent.GameAgent;
-import at.ac.tuwien.ifs.sge.agent.alpharisk.domain.DefaultState;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.domain.RiskState;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.domain.StateFactory;
-import at.ac.tuwien.ifs.sge.agent.alpharisk.mcts.policies.TreePolicy;
-import at.ac.tuwien.ifs.sge.agent.alpharisk.mcts.policies.UCTPolicy;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.mcts.heuristics.StateHeuristics;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.mcts.heuristics.ValueFunction;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.mcts.policies.HeuristicUCTPolicy;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.mcts.policies.RandomRolloutPolicy;
-import at.ac.tuwien.ifs.sge.agent.alpharisk.mcts.policies.RolloutPolicy;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.mcts.simulation.LimitedDepthSimulation;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.tree.NodeFactories;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.tree.Node;
@@ -31,7 +30,7 @@ public class AlphaRiskAgent extends AbstractGameAgent<Risk, RiskAction> implemen
 
     public static class HyperParameters {
         public double explorationConstant = 0.5;
-        public int maxRolloutDepth = 32;
+        public int maxRolloutDepth = 16;
     }
 
     private final HyperParameters parameters;
@@ -42,10 +41,9 @@ public class AlphaRiskAgent extends AbstractGameAgent<Risk, RiskAction> implemen
         super(0.75, 5L, TimeUnit.SECONDS, log);
         currentPhase = RiskState.Phase.INITIAL_SELECT;
         parameters = new HyperParameters();
-        var treePolicy = new UCTPolicy(parameters.explorationConstant);
+        var treePolicy = new HeuristicUCTPolicy(parameters.explorationConstant, StateHeuristics.territoryRatioHeuristic());
         var rolloutPolicy = new RandomRolloutPolicy();
-        Function<RiskState, Double> valueFunction = s -> (double) s.getBoard().getNrOfTerritoriesOccupiedByPlayer(s.getCurrentPlayer()) / s.getBoard().getTerritories().size();
-        var simulationStrategy = new LimitedDepthSimulation(parameters.maxRolloutDepth, valueFunction);
+        var simulationStrategy = new LimitedDepthSimulation(parameters.maxRolloutDepth, StateHeuristics.territoryRatioHeuristic());
         this.searchTreeBuilder = SearchTree.getSearchTreeBuilder(rolloutPolicy, treePolicy, simulationStrategy);
     }
 
@@ -58,6 +56,10 @@ public class AlphaRiskAgent extends AbstractGameAgent<Risk, RiskAction> implemen
         searchTree = updateSearchTree(game);
         int counter = 0;
 
+        if (currentPhase == RiskState.Phase.INITIAL_REINFORCE) {
+            return Util.selectRandom(game.getPossibleActions());
+        }
+
         while (!this.shouldStopComputation()) {
             var node = searchTree.select();
             var expanded = searchTree.expand(node);
@@ -65,7 +67,9 @@ public class AlphaRiskAgent extends AbstractGameAgent<Risk, RiskAction> implemen
                 searchTree.rollout(expanded);
             }
             counter++;
-            TreeVisualization.save(searchTree.getRoot(), String.format("../logs/searchtree-%d.dot", counter), Format.DOT);
+            if (counter % 16 == 0) {
+                TreeVisualization.save(searchTree.getRoot(), String.format("../logs/searchtree-%d.dot", counter), Format.DOT);
+            }
         }
         BoardVisualization.saveBoard(String.format("../logs/current_board.svg", game.getNumberOfActions()), searchTree.getRoot().getState());
         log.info(String.format("Run %d iterations. Expanded nodes: %d.", counter, searchTree.size()));

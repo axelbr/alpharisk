@@ -1,10 +1,7 @@
 package at.ac.tuwien.ifs.sge.agent.alpharisk.domain;
 
 import at.ac.tuwien.ifs.sge.agent.alpharisk.tree.decision.*;
-import at.ac.tuwien.ifs.sge.game.risk.board.Risk;
-import at.ac.tuwien.ifs.sge.game.risk.board.RiskAction;
-import at.ac.tuwien.ifs.sge.game.risk.board.RiskBoard;
-import at.ac.tuwien.ifs.sge.game.risk.board.RiskTerritory;
+import at.ac.tuwien.ifs.sge.game.risk.board.*;
 
 import java.util.HashSet;
 import java.util.List;
@@ -47,7 +44,7 @@ public abstract class RiskState {
     }
 
 
-    private boolean controlsContinent(int continentId, int player) {
+    public boolean controlsContinent(int continentId, int player) {
         var board = risk.getBoard();
         var occupants = board.getTerritories().values().stream()
                 .filter(t -> t.getContinentId() == continentId)
@@ -56,6 +53,12 @@ public abstract class RiskState {
         boolean atLeastOneTerritory = occupants.stream().anyMatch(i -> i == player);
         boolean allTerritorriesSameOccupant = occupants.stream().distinct().count() == 1;
         return allTerritorriesSameOccupant && atLeastOneTerritory;
+    }
+
+    public List<Integer> getControlledContinents(int player) {
+        return getBoard().getContinentIds()
+                .stream().filter(c -> controlsContinent(c, player))
+                .collect(Collectors.toList());
     }
 
     public RiskState apply(RiskAction action) {

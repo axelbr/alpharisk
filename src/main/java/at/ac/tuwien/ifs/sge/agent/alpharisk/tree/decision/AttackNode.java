@@ -2,6 +2,7 @@ package at.ac.tuwien.ifs.sge.agent.alpharisk.tree.decision;
 
 import at.ac.tuwien.ifs.sge.agent.alpharisk.domain.RiskState;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.tree.Node;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.tree.NodeFactories;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.tree.chance.AttackOutcomeNode;
 import at.ac.tuwien.ifs.sge.game.risk.board.RiskAction;
 
@@ -15,13 +16,12 @@ public class AttackNode extends DecisionNode {
 
     @Override
     protected Node createChild(RiskState state, RiskAction action) {
-        if (isAttackAction(action) && false) {
+        if (isAttackAction(action)) {
             var node = new AttackOutcomeNode(this, getState(), action);
-            node.expand(null);
             return node;
         } else {
             var nextState = getState().apply(action);
-            return new DefaultDecisionNode(this, nextState, action);
+            return NodeFactories.makeNode(this, nextState, action);
         }
     }
 
@@ -36,8 +36,19 @@ public class AttackNode extends DecisionNode {
         }
     }
 
+    @Override
+    public Node expand(RiskAction action) {
+        var child = createChild(getState(), action);
+        super.addChild(child);
+        if (isAttackAction(action)) {
+            return child.select(null);
+        } else {
+            return child;
+        }
+    }
 
     private boolean isAttackAction(RiskAction action) {
         return !action.isEndPhase() && !action.isCardIds() && !action.isBonus();
     }
+
 }

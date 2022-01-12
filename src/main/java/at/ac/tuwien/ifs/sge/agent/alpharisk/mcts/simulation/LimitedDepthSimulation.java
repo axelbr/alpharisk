@@ -2,18 +2,25 @@ package at.ac.tuwien.ifs.sge.agent.alpharisk.mcts.simulation;
 
 import at.ac.tuwien.ifs.sge.agent.alpharisk.domain.RiskState;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.mcts.SimulationStrategy;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.mcts.heuristics.ValueFunction;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.mcts.policies.RolloutPolicy;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.tree.Node;
+import org.apache.commons.math3.distribution.BinomialDistribution;
 
+import java.util.Random;
 import java.util.function.Function;
 
 public class LimitedDepthSimulation implements SimulationStrategy {
     private final int maxDepth;
-    private final Function<RiskState, Double> valueFunction;
+    private final ValueFunction valueFunction;
 
-    public LimitedDepthSimulation(int maxDepth, Function<RiskState, Double> stateUtilityFunction) {
+    public LimitedDepthSimulation(int maxDepth, ValueFunction stateUtilityFunction) {
         this.maxDepth = maxDepth;
         this.valueFunction = stateUtilityFunction;
+    }
+
+    public LimitedDepthSimulation(int maxDepth) {
+        this(maxDepth, s -> 0.0);
     }
 
     @Override
@@ -29,7 +36,8 @@ public class LimitedDepthSimulation implements SimulationStrategy {
         if (state.getPhase() == RiskState.Phase.TERMINATED) {
             value = state.hasWon() ? 1.0 : 0.0;
         } else {
-            value = valueFunction.apply(state);
+            var winProbability = valueFunction.evaluate(state);
+            value = Math.random() < winProbability ? 1.0 : 0.0;
         }
         return value;
     }

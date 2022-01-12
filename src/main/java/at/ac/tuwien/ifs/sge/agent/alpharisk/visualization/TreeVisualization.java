@@ -9,10 +9,17 @@ import guru.nidi.graphviz.model.MutableGraph;
 import guru.nidi.graphviz.model.MutableNode;
 
 import java.io.*;
+import java.util.Map;
 
 import static guru.nidi.graphviz.model.Factory.*;
 
 public class TreeVisualization {
+
+   private static Map<Integer, Color> playerColors  = Map.of(
+           0, Color.WHITE.fill(),
+           1, Color.GRAY.fill()
+   );
+
     private static MutableGraph toDotGraph(Node node) {
         MutableGraph g = mutGraph("Search Tree").setDirected(true)
                         .add(buildGraph(node));
@@ -74,7 +81,7 @@ public class TreeVisualization {
     }
 
     private static Attributes<ForAll> edgeLabel(ChanceNode parent, Node child) {
-        String chance = String.format("%.2f%%", parent.getProbability(child.getState()) * 100);
+        String chance = String.format("%.2f%%", parent.getOutcomeProbability(child) * 100);
         return Attributes.attrs(Label.of(chance));
     }
 
@@ -84,13 +91,15 @@ public class TreeVisualization {
 
     private static MutableNode toGraphNode(Node node) {
         String label = getLabel(node);
+        var mutNode = mutNode(label);
         if (node instanceof DecisionNode) {
-            return mutNode(label).add(Shape.DIAMOND);
+            mutNode = mutNode.add(Shape.DIAMOND);
         } else if (node instanceof ChanceNode) {
-            return mutNode(label);
+            mutNode = mutNode(label);
         } else {
-            return mutNode(label);
+            mutNode = mutNode(label);
         }
+        return mutNode.add(playerColors.get(node.getState().getCurrentPlayer()), Style.FILLED);
     }
 
     private static String getLabel(Node node) {

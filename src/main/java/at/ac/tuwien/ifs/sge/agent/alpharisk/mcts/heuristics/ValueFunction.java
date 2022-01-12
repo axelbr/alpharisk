@@ -4,5 +4,7 @@ import at.ac.tuwien.ifs.sge.agent.alpharisk.domain.RiskState;
 
 import java.util.function.Function;
 
-public interface ValueFunction extends Function<RiskState, Double> {
+@FunctionalInterface
+public interface ValueFunction {
+    double evaluate(RiskState state);
 }

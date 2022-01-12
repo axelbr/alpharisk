@@ -4,6 +4,7 @@ import at.ac.tuwien.ifs.sge.agent.alpharisk.domain.RiskState;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.mcts.policies.TreePolicy;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.mcts.policies.RolloutPolicy;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.mcts.SimulationStrategy;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.tree.chance.ChanceNode;
 import at.ac.tuwien.ifs.sge.util.Util;
 import com.google.common.collect.Sets;
 
@@ -59,9 +60,6 @@ public class SearchTree {
             var remaining = Sets.difference(actions, node.expandedActions());
             var action = Util.selectRandom(remaining);
             var child = node.expand(action);
-            if (child != null) {
-                node.addChild(child);
-            }
             return child;
         } else {
             return null;

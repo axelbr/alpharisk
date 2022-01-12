@@ -22,7 +22,7 @@ public class AttackState extends RiskState {
         var actions = possibleActions.stream()
                 .filter(a -> (a.troops() == board.getMaxAttackingTroops(a.attackingId()))
                         || a.isEndPhase() || a.isBonus())
-                .filter(a -> board.getTerritoryTroops(a.attackingId()) > board.getTerritoryTroops(a.defendingId()))
+                .filter(a -> a.isEndPhase() || a.isBonus() || board.getTerritoryTroops(a.attackingId()) > board.getTerritoryTroops(a.defendingId()))
                 .collect(Collectors.toSet());
         if (actions.isEmpty()) {
             return possibleActions;

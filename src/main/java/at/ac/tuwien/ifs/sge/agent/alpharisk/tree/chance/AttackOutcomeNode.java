@@ -3,11 +3,15 @@ package at.ac.tuwien.ifs.sge.agent.alpharisk.tree.chance;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.domain.RiskState;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.tree.Node;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.tree.NodeFactories;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.tree.decision.AttackNode;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.tree.decision.DefaultDecisionNode;
 import at.ac.tuwien.ifs.sge.game.risk.board.RiskAction;
 import com.google.common.collect.Sets;
+import org.apache.commons.math3.distribution.EnumeratedDistribution;
+import org.apache.commons.math3.util.Pair;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 class Outcome {
 
@@ -90,7 +94,8 @@ class Outcome {
 public class AttackOutcomeNode extends ChanceNode {
 
     private Set<Outcome> possibleOutcomes = new HashSet<>();
-    private Set<Outcome> sampledOutcomes = new HashSet<>();
+    private Map<Outcome, Node> sampledOutcomes = new HashMap<>();
+    private List<Pair<Node, Double>> children = new ArrayList<>();
 
     public AttackOutcomeNode(Node parent, RiskState state, RiskAction action) {
         super(parent, state, action);
@@ -113,30 +118,53 @@ public class AttackOutcomeNode extends ChanceNode {
         return Math.min(2, getState().getBoard().getTerritoryTroops(territory));
     }
 
-    @Override
-    public double getProbability(RiskState nextState) {
-        return computeOutcome(getState(), nextState).probability;
+
+    private Node sampleFromDistribution() {
+        var distribution = new EnumeratedDistribution<>(children);
+        return distribution.sample();
     }
 
-    @Override
-    protected boolean isAlreadySampled(Node node) {
-        var outcome = computeOutcome(getState(), node.getState());
-        return sampledOutcomes.contains(outcome);
-    }
-
-    @Override
-    public Node sampleOutcome() {
+    private Node sampleFromModel() {
         var action = getAction();
         var nextState = getState().apply(action);
-        if (nextState.getPhase() == RiskState.Phase.ATTACK) {
-            return new AttackOutcomeNode(this, nextState, action);
+        Node node = NodeFactories.makeNode(this, nextState, action);
+        return node;
+    }
+
+    @Override
+    public double getOutcomeProbability(Node child) {
+        return computeOutcome(getState(), child.getState()).probability;
+    }
+
+    @Override
+    public Node select(RiskAction action) {
+        if (sampledOutcomes.size() == possibleOutcomes.size()) {
+            return sampleFromDistribution();
+        }
+        var node = sampleFromModel();
+        var outcome = computeOutcome(getState(), node.getState());
+        if (sampledOutcomes.containsKey(outcome)) {
+            return sampledOutcomes.get(outcome);
         } else {
-            return new DefaultDecisionNode(this, nextState, action);
+            sampledOutcomes.put(outcome, node);
+            children.add(Pair.create(node, outcome.probability));
+            return node;
         }
     }
 
     @Override
-    public boolean isFullyExpanded() {
-        return possibleOutcomes.size() == sampledOutcomes.size();
+    public void addChild(Node node) {
+        var outcome = computeOutcome(getState(), node.getState());
+        if (!sampledOutcomes.containsKey(outcome) && outcome.probability > 0.0) {
+            sampledOutcomes.put(outcome, node);
+            children.add(Pair.create(node, outcome.probability));
+        }
+    }
+
+
+
+    @Override
+    public Collection<? extends Node> expandedChildren() {
+        return sampledOutcomes.values();
     }
 }

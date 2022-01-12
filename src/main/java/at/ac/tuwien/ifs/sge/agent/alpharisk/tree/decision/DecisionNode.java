@@ -33,7 +33,6 @@ public abstract class DecisionNode extends AbstractNode {
     @Override
     public Node expand(RiskAction action) {
         if (!isFullyExpanded() && untriedActions.contains(action)) {
-            untriedActions.remove(action);
             var child = createChild(getState(), action);
             addChild(child);
             return child;
@@ -44,7 +43,10 @@ public abstract class DecisionNode extends AbstractNode {
 
     @Override
     public void addChild(Node node) {
-        expandedChildren.put(node.getAction(), node);
+        if (!expandedChildren.containsKey(node.getAction()) && untriedActions.contains(node.getAction())) {
+            untriedActions.remove(node.getAction());
+            expandedChildren.put(node.getAction(), node);
+        }
     }
 
     @Override
@@ -56,4 +58,5 @@ public abstract class DecisionNode extends AbstractNode {
     public boolean isFullyExpanded() {
         return untriedActions.isEmpty();
     }
+
 }
