@@ -1,4 +1,4 @@
-package at.ac.tuwien.ifs.sge.agent.alpharisk.mcts.heuristics;
+package at.ac.tuwien.ifs.sge.agent.alpharisk.mcts;
 
 import at.ac.tuwien.ifs.sge.agent.alpharisk.domain.RiskState;
 

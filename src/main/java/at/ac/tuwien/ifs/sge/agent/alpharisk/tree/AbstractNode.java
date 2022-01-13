@@ -67,13 +67,6 @@ public abstract class AbstractNode implements Node {
     public void update(double value) {
         this.value += value;
         visits += 1;
-        if (parent != null) {
-            if (parent.getState().getCurrentPlayer() != state.getCurrentPlayer()) {
-                parent.update(1.0 - value);
-            } else {
-                parent.update(value);
-            }
-        }
     }
 
     @Override

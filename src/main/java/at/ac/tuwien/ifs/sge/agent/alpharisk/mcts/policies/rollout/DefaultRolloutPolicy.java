@@ -1,8 +1,8 @@
-package at.ac.tuwien.ifs.sge.agent.alpharisk.mcts.policies;
+package at.ac.tuwien.ifs.sge.agent.alpharisk.mcts.policies.rollout;
 
 import at.ac.tuwien.ifs.sge.agent.alpharisk.domain.RiskState;
-import at.ac.tuwien.ifs.sge.agent.alpharisk.mcts.heuristics.selection.ActionSelectionHeuristic;
-import at.ac.tuwien.ifs.sge.agent.alpharisk.mcts.heuristics.utility.StateUtilityHeuristic;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.domain.heuristics.selection.ActionSelectionHeuristic;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.domain.heuristics.utility.StateUtilityHeuristic;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.tree.Node;
 import at.ac.tuwien.ifs.sge.game.risk.board.RiskAction;
 import at.ac.tuwien.ifs.sge.util.Util;

@@ -37,6 +37,9 @@ dependencies {
     implementation fileTree(dir: 'environment', include: ['*.jar'])
     implementation("com.google.guava:guava:31.0.1-jre")
     implementation 'org.apache.commons:commons-math3:3.6.1'
+    implementation 'org.apache.commons:commons-configuration2:2.7'
+    compileOnly 'org.projectlombok:lombok:1.18.22'
+    annotationProcessor 'org.projectlombok:lombok:1.18.22'
     implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.32'
     implementation group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.32'
 }

@@ -1,4 +1,6 @@
-package at.ac.tuwien.ifs.sge.agent.alpharisk.mcts.heuristics;
+package at.ac.tuwien.ifs.sge.agent.alpharisk.domain.heuristics;
+
+import at.ac.tuwien.ifs.sge.agent.alpharisk.mcts.ValueFunction;
 
 public class StateHeuristics {
     public static ValueFunction territoryRatioHeuristic() {

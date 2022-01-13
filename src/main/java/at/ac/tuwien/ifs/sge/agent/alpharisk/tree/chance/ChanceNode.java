@@ -40,9 +40,4 @@ public abstract class ChanceNode extends AbstractNode {
     public String toString() {
         return "Chance" + super.toString();
     }
-
-    @Override
-    public void update(double value) {
-        super.update(value);
-    }
 }
