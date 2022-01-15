@@ -61,7 +61,7 @@ public class RapidActionValueEstimationSearch extends DefaultMonteCarloTreeSearc
                 currentPlayer = current.getState().getCurrentPlayer();
             }
 
-            for (Node sibling: getPlayedActionSiblings(current, playerActions.get(currentPlayer))) {
+            for (Node sibling: getPlayedActionSiblings(current, playerActions.getOrDefault(currentPlayer, new HashSet<>()))) {
                 sibling.update(statistics);
             }
             current.update(statistics.concat(RaveNode.VALUE, currentValue));
