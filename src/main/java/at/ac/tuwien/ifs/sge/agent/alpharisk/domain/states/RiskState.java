@@ -1,9 +1,7 @@
-package at.ac.tuwien.ifs.sge.agent.alpharisk.domain;
+package at.ac.tuwien.ifs.sge.agent.alpharisk.domain.states;
 
-import at.ac.tuwien.ifs.sge.agent.alpharisk.tree.decision.*;
 import at.ac.tuwien.ifs.sge.game.risk.board.*;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -25,6 +23,10 @@ public abstract class RiskState {
 
     public Phase getPhase() {
         return phase;
+    }
+
+    public double getUtility() {
+        return risk.getUtilityValue(risk.getCurrentPlayer());
     }
 
     public Risk getGame() {

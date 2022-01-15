@@ -1,8 +1,6 @@
-package at.ac.tuwien.ifs.sge.agent.alpharisk.tree.decision;
+package at.ac.tuwien.ifs.sge.agent.alpharisk.tree.nodes;
 
-import at.ac.tuwien.ifs.sge.agent.alpharisk.domain.RiskState;
-import at.ac.tuwien.ifs.sge.agent.alpharisk.tree.AbstractNode;
-import at.ac.tuwien.ifs.sge.agent.alpharisk.tree.Node;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.domain.states.RiskState;
 import at.ac.tuwien.ifs.sge.game.risk.board.RiskAction;
 
 import java.util.*;

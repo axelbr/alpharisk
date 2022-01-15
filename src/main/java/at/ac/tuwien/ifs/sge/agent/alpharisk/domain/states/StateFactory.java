@@ -1,4 +1,4 @@
-package at.ac.tuwien.ifs.sge.agent.alpharisk.domain;
+package at.ac.tuwien.ifs.sge.agent.alpharisk.domain.states;
 
 import at.ac.tuwien.ifs.sge.game.risk.board.Risk;
 

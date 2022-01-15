@@ -1,6 +1,6 @@
 package at.ac.tuwien.ifs.sge.agent.alpharisk.domain.heuristics.selection;
 
-import at.ac.tuwien.ifs.sge.agent.alpharisk.domain.RiskState;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.domain.states.RiskState;
 import at.ac.tuwien.ifs.sge.game.risk.board.RiskAction;
 import org.apache.commons.math3.util.Pair;
 

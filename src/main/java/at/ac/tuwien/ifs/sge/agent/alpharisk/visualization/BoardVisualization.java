@@ -1,6 +1,6 @@
 package at.ac.tuwien.ifs.sge.agent.alpharisk.visualization;
 
-import at.ac.tuwien.ifs.sge.agent.alpharisk.domain.RiskState;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.domain.states.RiskState;
 import org.apache.batik.anim.dom.SAXSVGDocumentFactory;
 import org.apache.batik.transcoder.Transcoder;
 import org.apache.batik.transcoder.TranscoderException;
@@ -10,15 +10,12 @@ import org.apache.batik.transcoder.image.JPEGTranscoder;
 import org.apache.batik.transcoder.image.PNGTranscoder;
 import org.apache.batik.transcoder.svg2svg.SVGTranscoder;
 import org.apache.batik.util.XMLResourceDescriptor;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import org.w3c.dom.svg.SVGDocument;
 
 import java.io.*;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 
 public class BoardVisualization {

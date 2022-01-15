@@ -1,17 +1,14 @@
-package at.ac.tuwien.ifs.sge.agent.alpharisk.tree.chance;
+package at.ac.tuwien.ifs.sge.agent.alpharisk.domain.nodes;
 
-import at.ac.tuwien.ifs.sge.agent.alpharisk.domain.RiskState;
-import at.ac.tuwien.ifs.sge.agent.alpharisk.tree.Node;
-import at.ac.tuwien.ifs.sge.agent.alpharisk.tree.NodeFactories;
-import at.ac.tuwien.ifs.sge.agent.alpharisk.tree.decision.AttackNode;
-import at.ac.tuwien.ifs.sge.agent.alpharisk.tree.decision.DefaultDecisionNode;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.domain.states.RiskState;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.tree.factories.NodeFactory;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.tree.nodes.Node;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.tree.nodes.ChanceNode;
 import at.ac.tuwien.ifs.sge.game.risk.board.RiskAction;
-import com.google.common.collect.Sets;
 import org.apache.commons.math3.distribution.EnumeratedDistribution;
 import org.apache.commons.math3.util.Pair;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 class Outcome {
 
@@ -103,6 +100,8 @@ public class AttackOutcomeNode extends ChanceNode {
         int defendingTroops = Math.min(2, territoryTroops);
         var outcomes = Outcome.getPossibleOutcomes(getAction().troops(), defendingTroops);
         possibleOutcomes.addAll(outcomes);
+        Node node = NodeFactory.node(this, state, action);
+        addChild(node);
     }
 
     private Outcome computeOutcome(RiskState state, RiskState nextState) {
@@ -127,7 +126,7 @@ public class AttackOutcomeNode extends ChanceNode {
     private Node sampleFromModel() {
         var action = getAction();
         var nextState = getState().apply(action);
-        Node node = NodeFactories.makeNode(this, nextState, action);
+        Node node = NodeFactory.node(this, nextState, action);
         return node;
     }
 
@@ -160,7 +159,6 @@ public class AttackOutcomeNode extends ChanceNode {
             children.add(Pair.create(node, outcome.probability));
         }
     }
-
 
 
     @Override

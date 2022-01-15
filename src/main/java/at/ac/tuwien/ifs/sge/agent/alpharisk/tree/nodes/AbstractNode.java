@@ -1,12 +1,12 @@
-package at.ac.tuwien.ifs.sge.agent.alpharisk.tree;
+package at.ac.tuwien.ifs.sge.agent.alpharisk.tree.nodes;
 
-import at.ac.tuwien.ifs.sge.agent.alpharisk.domain.RiskState;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.domain.states.RiskState;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.tree.factories.NodeFactory;
 import at.ac.tuwien.ifs.sge.game.risk.board.RiskAction;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 
 public abstract class AbstractNode implements Node {
 
@@ -64,9 +64,14 @@ public abstract class AbstractNode implements Node {
     }
 
     @Override
-    public void update(double value) {
-        this.value += value;
-        visits += 1;
+    public void update(NodeStatistics statistics) {
+        this.visits += 1;
+        this.value += statistics.getDouble("value");
+    }
+
+    @Override
+    public NodeStatistics getStatistics() {
+        return NodeStatistics.of("value", value).concat("visits", visits);
     }
 
     @Override

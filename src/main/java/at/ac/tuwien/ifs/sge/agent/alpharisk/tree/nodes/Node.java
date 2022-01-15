@@ -1,6 +1,7 @@
-package at.ac.tuwien.ifs.sge.agent.alpharisk.tree;
+package at.ac.tuwien.ifs.sge.agent.alpharisk.tree.nodes;
 
-import at.ac.tuwien.ifs.sge.agent.alpharisk.domain.RiskState;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.domain.states.RiskState;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.tree.factories.NodeFactory;
 import at.ac.tuwien.ifs.sge.game.risk.board.RiskAction;
 
 import java.util.Collection;
@@ -20,7 +21,8 @@ public interface Node {
 
     Node select(RiskAction action);
     Node expand(RiskAction action);
-    void update(double value);
+    void update(NodeStatistics statistics);
+    NodeStatistics getStatistics();
     void addChild(Node node);
 
     default boolean isLeaf() {

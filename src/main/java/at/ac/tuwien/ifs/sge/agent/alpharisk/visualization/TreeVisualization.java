@@ -1,7 +1,8 @@
 package at.ac.tuwien.ifs.sge.agent.alpharisk.visualization;
-import at.ac.tuwien.ifs.sge.agent.alpharisk.tree.Node;
-import at.ac.tuwien.ifs.sge.agent.alpharisk.tree.chance.ChanceNode;
-import at.ac.tuwien.ifs.sge.agent.alpharisk.tree.decision.DecisionNode;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.tree.nodes.Node;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.tree.nodes.ChanceNode;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.tree.nodes.DecisionNode;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.tree.nodes.NodeWrapper;
 import guru.nidi.graphviz.attribute.*;
 import guru.nidi.graphviz.engine.Format;
 import guru.nidi.graphviz.engine.Graphviz;
@@ -71,6 +72,9 @@ public class TreeVisualization {
     }
 
     private static Attributes<ForAll> edgeLabel(Node parent, Node child) {
+        while (parent instanceof NodeWrapper) {
+            parent = ((NodeWrapper) parent).unwrapped();
+        }
         if (parent instanceof DecisionNode) {
             return edgeLabel((DecisionNode) parent, child);
         } else if (parent instanceof ChanceNode) {
