@@ -11,3 +11,16 @@
 - Various Heuristics: [Evaluating Heuristics in the Game Risk
 An Aritifical Intelligence Perspective](https://project.dke.maastrichtuniversity.nl/games/files/bsc/Hahn_Bsc-paper.pdf)
 - Initial Select Heuristic: [An Automated Technique for Drafting Territories in the Board Game Risk](https://www.researchgate.net/publication/220978458_An_Automated_Technique_for_Drafting_Territories_in_the_Board_Game_Risk)
+
+
+## Artifacts
+
+### Algorithms
+- RAVE 
+- UCT
+
+### utility functions
+- -bon     bonusRatioHeuristic
+- -MCbon   Math.random() < bonusRatioHeuristic
+- -ter     territoryRatioHeuristic
+- -MCter   Math.random() < sample(territoryRatioHeuristic)
