@@ -23,6 +23,7 @@ public abstract class AbstractNode implements Node {
         this.parent = parent;
         this.state = state;
         this.action = action;
+        this.statistics.with(VISITS, 0).with(VALUE,0);
     }
 
     @Override
@@ -78,9 +79,10 @@ public abstract class AbstractNode implements Node {
         return statistics;
     }
 
+
     @Override
     public String toString() {
-        return getState().getPhase().toString();
+        return getState().getPhase().toString()+"\n("+statistics+")";
     }
 
 }

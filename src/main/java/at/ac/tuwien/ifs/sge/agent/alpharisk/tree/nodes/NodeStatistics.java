@@ -3,6 +3,7 @@ package at.ac.tuwien.ifs.sge.agent.alpharisk.tree.nodes;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class NodeStatistics {
     private Map<String, Number> statistics = new HashMap<>();
@@ -78,4 +79,11 @@ public class NodeStatistics {
         return statistics.entrySet();
     }
 
+    @Override
+    public String toString() {
+        return entrieSet().stream()
+                .map(entry -> entry.getKey() + ": " + entry.getValue())
+                .collect(Collectors.joining(", "));
+
+    }
 }

@@ -1,3 +1,5 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+
 plugins {
     id 'java'
     id 'com.github.johnrengelman.shadow' version '7.1.0'
@@ -45,17 +47,35 @@ dependencies {
 }
 
 
-def conf = 'all'
-shadowJar {
 
+shadowJar {
+    archiveClassifier.set("dev")
     destinationDirectory = file('environment/agents')
+
+    manifest {
+        attributes('Sge-Type': 'agent',
+                'Agent-Class': 'at.ac.tuwien.ifs.sge.agent.alpharisk.AlphaRiskAgent',
+                'Agent-Name': 'AlphaRiskAgent')
+    }
+
+    exclude("at/ac/tuwien/ifs/sge/agent/alphabetaagent")
+    exclude("at/ac/tuwien/ifs/sge/agent/mctsagent")
+    exclude("at/ac/tuwien/ifs/sge/agent/randomagent")
+    exclude("at/ac/tuwien/ifs/sge/agent/risk")
+    minimize()
+}
+
+def conf = 'UCT-MCbon'
+task shadowJarDeploy(type: ShadowJar) {
     archiveClassifier.set(conf)
+    destinationDirectory = file('environment/agents')
 
     manifest {
         attributes('Sge-Type': 'agent',
                 'Agent-Class': 'at.ac.tuwien.ifs.sge.agent.alpharisk.AlphaRiskAgent',
                 'Agent-Name': 'AlphaRisk'+conf)
     }
+
 
     exclude("at/ac/tuwien/ifs/sge/agent/alphabetaagent")
     exclude("at/ac/tuwien/ifs/sge/agent/mctsagent")

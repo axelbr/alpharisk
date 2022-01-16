@@ -111,7 +111,6 @@ public class TreeVisualization {
     }
 
     private static String getLabel(Node node) {
-        String label = String.format("%s\n{V: %.2f, N: %d}\n@%s", node, node.getValue(), node.getVisits(), Integer.toHexString(node.hashCode()));
-        return label;
+        return String.format("%s\n@%s", node, Integer.toHexString(node.hashCode()));
     }
 }
