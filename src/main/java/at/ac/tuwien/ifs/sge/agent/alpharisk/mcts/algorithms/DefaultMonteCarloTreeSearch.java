@@ -22,6 +22,9 @@ import java.util.function.Function;
 @Setter
 public class DefaultMonteCarloTreeSearch implements MonteCarloTreeSearch<RiskState, RiskAction> {
 
+    public final static String VISITS = "visits";
+    public final static String VALUE = "value";
+
     private Policy<Node, RiskAction> treePolicy;
     private Policy<Node, RiskAction> actionSelectionPolicy;
     private Policy<RiskState, RiskAction> rolloutPolicy;
@@ -39,13 +42,12 @@ public class DefaultMonteCarloTreeSearch implements MonteCarloTreeSearch<RiskSta
     }
 
     @Override
-    public Function<Node, Node> nodeConstructor() {
-        return n -> n;
-    }
-
-    @Override
     public RiskAction getBestAction(Node node) {
         return actionSelectionPolicy.selectAction(node);
+    }
+
+    protected ValueFunction sample(ValueFunction f){
+        return s->Math.random()<f.evaluate(s)?1.0:0.0;
     }
 
     @Override
@@ -93,13 +95,13 @@ public class DefaultMonteCarloTreeSearch implements MonteCarloTreeSearch<RiskSta
         var lastState = playout.get(playout.size() - 1).getA();
         var currentPlayer = node.getState().getCurrentPlayer();
         var currentValue = utilityFunction.evaluate(lastState);
+        NodeStatistics statistics = NodeStatistics.of(VISITS,1);
         while (current != null) {
             if (current.getState().getCurrentPlayer() != currentPlayer) {
                 currentValue = 1.0 - currentValue;
                 currentPlayer = current.getState().getCurrentPlayer();
             }
-            NodeStatistics statistics = NodeStatistics.of("value", currentValue);
-            current.update(statistics);
+            current.update(statistics.concat(VALUE, currentValue));
             current = current.getParent();
         }
     }

@@ -11,7 +11,6 @@ import at.ac.tuwien.ifs.sge.util.pair.Pair;
 import org.apache.commons.configuration2.BaseConfiguration;
 import org.apache.commons.configuration2.Configuration;
 
-import javax.swing.*;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -19,6 +18,9 @@ import java.util.stream.Collectors;
 public class RapidActionValueEstimationSearch extends DefaultMonteCarloTreeSearch {
 
     private final Configuration configuration;
+    public final static String AMAF_VISITS = "amaf_visits";
+    public final static String AMAF_VALUE = "amaf_value";
+    public final static String BIAS = "bias";
 
     public RapidActionValueEstimationSearch(Configuration configuration) {
         super();
@@ -31,17 +33,14 @@ public class RapidActionValueEstimationSearch extends DefaultMonteCarloTreeSearc
         var config = new BaseConfiguration();
         config.setProperty("explorationConstant", 0.5);
         config.setProperty("rolloutHorizon", 32);
-        config.setProperty("bias", 0.5);
+        config.setProperty(BIAS, 0.5);
         return config;
-    }
-
-    public Function<Node, Node> nodeConstructor() {
-        return n -> new RaveNode(n, configuration.getDouble("bias"));
     }
 
     @Override
     public void runIteration(Node root) {
-        super.runIteration(new RaveNode(root, configuration.getDouble("bias")));
+        root.getStatistics().update(BIAS,configuration.getDouble(BIAS));
+        super.runIteration(root);
     }
 
     @Override
@@ -53,7 +52,7 @@ public class RapidActionValueEstimationSearch extends DefaultMonteCarloTreeSearc
         var currentPlayer = node.getState().getCurrentPlayer();
         var currentValue = lastState.getGame().getUtilityValue(currentPlayer);
 
-        var statistics = NodeStatistics.of(RaveNode.AMAF_VALUE, currentValue);
+        var statistics = NodeStatistics.of(AMAF_VISITS, 1).with(AMAF_VALUE, currentValue);
 
         while (current != null) {
             if (current.getState().getCurrentPlayer() != currentPlayer) {
@@ -61,10 +60,12 @@ public class RapidActionValueEstimationSearch extends DefaultMonteCarloTreeSearc
                 currentPlayer = current.getState().getCurrentPlayer();
             }
 
-            for (Node sibling: getPlayedActionSiblings(current, playerActions.getOrDefault(currentPlayer, new HashSet<>()))) {
-                sibling.update(statistics);
+            for (Node sibling : getPlayedActionSiblings(current, playerActions.getOrDefault(currentPlayer, new HashSet<>()))) {
+                var amafValue = sibling.getStatistics().getDouble(AMAF_VALUE);
+                var amafVisits = sibling.getStatistics().getDouble(AMAF_VISITS);
+                sibling.update(statistics.concat(AMAF_VALUE, (currentValue - amafValue) / amafVisits));
             }
-            current.update(statistics.concat(RaveNode.VALUE, currentValue));
+            current.update(statistics.concat(VALUE, currentValue));
             current = current.getParent();
         }
     }
@@ -72,7 +73,7 @@ public class RapidActionValueEstimationSearch extends DefaultMonteCarloTreeSearc
 
     private Map<Integer, Set<RiskAction>> computePlayerActions(List<Pair<RiskState, RiskAction>> playout) {
         Map<Integer, Set<RiskAction>> playerActions = new HashMap<>();
-        for (Pair<RiskState, RiskAction> stateActionPair: playout.subList(0, playout.size() - 2)) {
+        for (Pair<RiskState, RiskAction> stateActionPair : playout.subList(0, playout.size() - 2)) {
             var state = stateActionPair.getA();
             var action = stateActionPair.getB();
             if (!playerActions.containsKey(state.getCurrentPlayer())) {

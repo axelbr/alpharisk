@@ -1,5 +1,6 @@
 package at.ac.tuwien.ifs.sge.agent.alpharisk.mcts.algorithms;
 
+import at.ac.tuwien.ifs.sge.agent.alpharisk.domain.heuristics.StateHeuristics;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.domain.states.RiskState;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.mcts.ValueFunction;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.mcts.policies.rollout.RandomRolloutPolicy;
@@ -15,19 +16,15 @@ import java.util.List;
 
 public class HeuristicUCTSearch extends DefaultMonteCarloTreeSearch {
 
-    public HeuristicUCTSearch(Configuration config, ValueFunction stateHeuristic) {
+    public HeuristicUCTSearch(Configuration config) {
         super();
         double explorationConstant = config.getDouble("explorationConstant");
         int rolloutHorizon = config.getInt("rolloutHorizon");
         setActionSelectionPolicy(new GreedyTreePolicy());
-        setTreePolicy(new HeuristicUCTPolicy(explorationConstant, stateHeuristic));
+        setTreePolicy(new HeuristicUCTPolicy(explorationConstant, StateHeuristics.bonusRatioHeuristic()));
         setRolloutPolicy(new RandomRolloutPolicy());
         setSimulationStrategy(new LimitedDepthSimulation(rolloutHorizon));
-        setUtilityFunction(s -> Math.random() < stateHeuristic.evaluate(s) ? 1.0 : 0.0);
-    }
-
-    public HeuristicUCTSearch(ValueFunction valueFunction) {
-        this(getDefaultConfiguration(), valueFunction);
+        setUtilityFunction(StateHeuristics.bonusRatioHeuristic());
     }
 
     public static Configuration getDefaultConfiguration() {

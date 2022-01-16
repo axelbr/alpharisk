@@ -63,6 +63,17 @@ public abstract class RiskState {
                 .collect(Collectors.toList());
     }
 
+    public int computeBonus(int player) {
+        var board = risk.getBoard();
+        int territoryBonus = board.getTerritoriesOccupiedByPlayer(player).size();
+        int contintentBonus = board.getContinentIds().stream()
+                .filter(c -> controlsContinent(c,player))
+                .map(board::getContinentBonus)
+                .reduce(0, Integer::sum);
+        //int tradeInBonus = board.hasToTradeInCards(player) ? board.getTradeInBonus() : 0;
+        return Integer.max(3, territoryBonus / 3) + contintentBonus; //+ tradeInBonus;
+    }
+
     public RiskState apply(RiskAction action) {
         Risk nextState = (Risk) this.risk.doAction(action);
         while (nextState.getCurrentPlayer() < 0) {

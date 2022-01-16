@@ -8,14 +8,16 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import static at.ac.tuwien.ifs.sge.agent.alpharisk.mcts.algorithms.DefaultMonteCarloTreeSearch.VALUE;
+import static at.ac.tuwien.ifs.sge.agent.alpharisk.mcts.algorithms.DefaultMonteCarloTreeSearch.VISITS;
+
 public abstract class AbstractNode implements Node {
 
     private final Node parent;
     private final RiskState state;
     private final RiskAction action;
     private final List<Node> children = new ArrayList<>();
-    private double value;
-    private int visits;
+    private final NodeStatistics statistics = new NodeStatistics();
 
     public AbstractNode(Node parent, RiskState state, RiskAction action) {
         this.parent = parent;
@@ -45,12 +47,13 @@ public abstract class AbstractNode implements Node {
 
     @Override
     public double getValue() {
-        return visits > 0 ? value / visits : value;
+        var value = statistics.getDouble(VALUE);
+        return getVisits() > 0 ? value / getVisits() : value;
     }
 
     @Override
     public int getVisits() {
-        return visits;
+        return statistics.getInt(VISITS);
     }
 
     @Override
@@ -65,13 +68,14 @@ public abstract class AbstractNode implements Node {
 
     @Override
     public void update(NodeStatistics statistics) {
-        this.visits += 1;
-        this.value += statistics.getDouble("value");
+        for(var entry:statistics.entrieSet()){
+            this.statistics.increment(entry.getKey(),entry.getValue().doubleValue());
+        }
     }
 
     @Override
     public NodeStatistics getStatistics() {
-        return NodeStatistics.of("value", value).concat("visits", visits);
+        return statistics;
     }
 
     @Override

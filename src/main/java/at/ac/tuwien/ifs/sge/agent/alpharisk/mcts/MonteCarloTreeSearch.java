@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.function.Function;
 
 public interface MonteCarloTreeSearch<S, A> {
-    Function<Node, Node> nodeConstructor();
     A getBestAction(Node node);
     void runIteration(Node root);
     Node select(Node node);

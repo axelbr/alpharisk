@@ -1,7 +1,8 @@
 package at.ac.tuwien.ifs.sge.agent.alpharisk.visualization;
-import at.ac.tuwien.ifs.sge.agent.alpharisk.tree.nodes.Node;
+
 import at.ac.tuwien.ifs.sge.agent.alpharisk.tree.nodes.ChanceNode;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.tree.nodes.DecisionNode;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.tree.nodes.Node;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.tree.nodes.NodeWrapper;
 import guru.nidi.graphviz.attribute.*;
 import guru.nidi.graphviz.engine.Format;
@@ -9,7 +10,10 @@ import guru.nidi.graphviz.engine.Graphviz;
 import guru.nidi.graphviz.model.MutableGraph;
 import guru.nidi.graphviz.model.MutableNode;
 
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Map;
 
 import static guru.nidi.graphviz.model.Factory.*;
@@ -85,7 +89,7 @@ public class TreeVisualization {
     }
 
     private static Attributes<ForAll> edgeLabel(ChanceNode parent, Node child) {
-        String chance = String.format("%.2f%%", parent.getOutcomeProbability(child) * 100);
+        String chance = parent.getOutcome(child).toString();
         return Attributes.attrs(Label.of(chance));
     }
 
@@ -107,7 +111,7 @@ public class TreeVisualization {
     }
 
     private static String getLabel(Node node) {
-        String label = String.format("%s{V: %.2f, N: %d}@%s", node, node.getValue(), node.getVisits(), Integer.toHexString(node.hashCode()));
+        String label = String.format("%s\n{V: %.2f, N: %d}\n@%s", node, node.getValue(), node.getVisits(), Integer.toHexString(node.hashCode()));
         return label;
     }
 }

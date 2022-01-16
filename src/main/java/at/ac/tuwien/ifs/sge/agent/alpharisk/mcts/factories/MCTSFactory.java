@@ -16,7 +16,7 @@ public class MCTSFactory {
 
     public static MonteCarloTreeSearch<RiskState, RiskAction> make(String algorithm) {
         if (HEURISTIC_UCT.equals(algorithm)) {
-            return makeHeuristicUCTSearch(HeuristicUCTSearch.getDefaultConfiguration(), StateHeuristics.territoryRatioHeuristic());
+            return makeHeuristicUCTSearch(HeuristicUCTSearch.getDefaultConfiguration());
         } if (RAVE.equals(algorithm)) {
             return makeRaveSearch(RapidActionValueEstimationSearch.getDefaultConfiguration());
         } else {
@@ -24,8 +24,8 @@ public class MCTSFactory {
         }
     }
 
-    public static MonteCarloTreeSearch<RiskState, RiskAction> makeHeuristicUCTSearch(Configuration configuration, ValueFunction stateHeuristic) {
-       return new HeuristicUCTSearch(configuration, stateHeuristic);
+    public static MonteCarloTreeSearch<RiskState, RiskAction> makeHeuristicUCTSearch(Configuration configuration) {
+       return new HeuristicUCTSearch(configuration);
     }
 
     public static MonteCarloTreeSearch<RiskState, RiskAction> makeRaveSearch(Configuration configuration) {

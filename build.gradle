@@ -44,13 +44,17 @@ dependencies {
     implementation group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.32'
 }
 
+
+def conf = 'all'
 shadowJar {
+
     destinationDirectory = file('environment/agents')
+    archiveClassifier.set(conf)
 
     manifest {
         attributes('Sge-Type': 'agent',
                 'Agent-Class': 'at.ac.tuwien.ifs.sge.agent.alpharisk.AlphaRiskAgent',
-                'Agent-Name': 'AlphaRiskAgent')
+                'Agent-Name': 'AlphaRisk'+conf)
     }
 
     exclude("at/ac/tuwien/ifs/sge/agent/alphabetaagent")

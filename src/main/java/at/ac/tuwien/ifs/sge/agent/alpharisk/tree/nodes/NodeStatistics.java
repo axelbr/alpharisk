@@ -2,7 +2,7 @@ package at.ac.tuwien.ifs.sge.agent.alpharisk.tree.nodes;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Function;
+import java.util.Set;
 
 public class NodeStatistics {
     private Map<String, Number> statistics = new HashMap<>();
@@ -23,8 +23,8 @@ public class NodeStatistics {
     }
 
     public NodeStatistics with(String key, Number value) {
-       this.update(key, value);
-       return this;
+        this.update(key, value);
+        return this;
     }
 
     public NodeStatistics concat(String key, Number value) {
@@ -35,7 +35,7 @@ public class NodeStatistics {
 
     public NodeStatistics concat(NodeStatistics statistics) {
         var stats = new NodeStatistics(this.statistics);
-        for (Map.Entry<String, Number> entry: statistics.statistics.entrySet()) {
+        for (Map.Entry<String, Number> entry : statistics.statistics.entrySet()) {
             stats.update(entry.getKey(), entry.getValue());
         }
         return stats;
@@ -58,7 +58,8 @@ public class NodeStatistics {
     }
 
     public void increment(String key, double value) {
-        update(key, getDouble(key) + value);
+        update(key, (this.contains(key) ? getDouble(key) : 0) + value);
+
     }
 
     public double getDouble(String key) {
@@ -71,6 +72,10 @@ public class NodeStatistics {
 
     public boolean contains(String key) {
         return statistics.containsKey(key);
+    }
+
+    public Set<Map.Entry<String, Number>> entrieSet() {
+        return statistics.entrySet();
     }
 
 }

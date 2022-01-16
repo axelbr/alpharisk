@@ -1,7 +1,7 @@
 package at.ac.tuwien.ifs.sge.agent.alpharisk.tree.nodes;
 
+import at.ac.tuwien.ifs.sge.agent.alpharisk.domain.nodes.AttackOutcomeNode;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.domain.states.RiskState;
-import at.ac.tuwien.ifs.sge.agent.alpharisk.tree.factories.NodeFactory;
 import at.ac.tuwien.ifs.sge.game.risk.board.RiskAction;
 
 import java.util.*;
@@ -14,6 +14,8 @@ public abstract class ChanceNode extends AbstractNode {
     }
 
     public abstract double getOutcomeProbability(Node child);
+
+    public abstract AttackOutcomeNode.Outcome getOutcome(Node child);
 
     @Override
     public final Node expand(RiskAction action) {
@@ -37,6 +39,6 @@ public abstract class ChanceNode extends AbstractNode {
 
     @Override
     public String toString() {
-        return "Chance" + super.toString();
+        return "Chance\n" + super.toString();
     }
 }
