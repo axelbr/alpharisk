@@ -94,7 +94,7 @@ public class DefaultMonteCarloTreeSearch implements MonteCarloTreeSearch<RiskSta
         var current = node;
         var lastState = playout.get(playout.size() - 1).getA();
         var currentPlayer = node.getState().getCurrentPlayer();
-        var currentValue = utilityFunction.evaluate(lastState);
+        var currentValue = utilityFunction.evaluate(lastState)*Math.pow(0.999,playout.size());
         NodeStatistics statistics = NodeStatistics.of(VISITS,1);
         while (current != null) {
             if (current.getState().getCurrentPlayer() != currentPlayer) {
@@ -104,5 +104,9 @@ public class DefaultMonteCarloTreeSearch implements MonteCarloTreeSearch<RiskSta
             current.update(statistics.concat(VALUE, currentValue));
             current = current.getParent();
         }
+    }
+
+    public double utility(RiskState state){
+        return utilityFunction.evaluate(state);
     }
 }

@@ -1,5 +1,6 @@
 package at.ac.tuwien.ifs.sge.agent.alpharisk.mcts.algorithms.rave;
 
+import at.ac.tuwien.ifs.sge.agent.alpharisk.domain.heuristics.StateHeuristics;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.domain.states.RiskState;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.mcts.algorithms.DefaultMonteCarloTreeSearch;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.mcts.policies.treepolicies.HeuristicUCTPolicy;
@@ -12,7 +13,6 @@ import org.apache.commons.configuration2.BaseConfiguration;
 import org.apache.commons.configuration2.Configuration;
 
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class RapidActionValueEstimationSearch extends DefaultMonteCarloTreeSearch {
@@ -27,6 +27,7 @@ public class RapidActionValueEstimationSearch extends DefaultMonteCarloTreeSearc
         this.configuration = configuration;
         setSimulationStrategy(new LimitedDepthSimulation(32));
         setTreePolicy(new HeuristicUCTPolicy(0.5));
+        setUtilityFunction(StateHeuristics.bonusRatioHeuristic());
     }
 
     public static Configuration getDefaultConfiguration() {
@@ -50,7 +51,7 @@ public class RapidActionValueEstimationSearch extends DefaultMonteCarloTreeSearc
         var current = node;
         var lastState = playout.get(playout.size() - 1).getA();
         var currentPlayer = node.getState().getCurrentPlayer();
-        var currentValue = lastState.getGame().getUtilityValue(currentPlayer);
+        var currentValue = utility(lastState);
 
         var statistics = NodeStatistics.of(AMAF_VISITS, 1).with(AMAF_VALUE, currentValue);
 

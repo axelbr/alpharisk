@@ -65,7 +65,7 @@ shadowJar {
     minimize()
 }
 
-def conf = 'UCT-MCbon'
+def conf = 'RAVE-bon'
 task shadowJarDeploy(type: ShadowJar) {
     archiveClassifier.set(conf)
     destinationDirectory = file('environment/agents')

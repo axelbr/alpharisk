@@ -82,7 +82,7 @@ public class NodeStatistics {
     @Override
     public String toString() {
         return entrieSet().stream()
-                .map(entry -> entry.getKey() + ": " + entry.getValue())
+                .map(entry -> entry.getKey() + ": " + String.format("%.2f",entry.getValue().doubleValue()))
                 .collect(Collectors.joining(", "));
 
     }
