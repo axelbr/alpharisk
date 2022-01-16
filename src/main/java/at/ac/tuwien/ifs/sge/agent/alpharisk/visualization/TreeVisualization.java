@@ -59,6 +59,9 @@ public class TreeVisualization {
     }
 
     private static MutableNode buildGraph(Node node) {
+        while (node instanceof NodeWrapper) {
+            node = ((NodeWrapper) node).unwrapped();
+        }
         if (node.isLeaf()) {
             return toGraphNode(node);
         } else {
@@ -72,9 +75,6 @@ public class TreeVisualization {
     }
 
     private static Attributes<ForAll> edgeLabel(Node parent, Node child) {
-        while (parent instanceof NodeWrapper) {
-            parent = ((NodeWrapper) parent).unwrapped();
-        }
         if (parent instanceof DecisionNode) {
             return edgeLabel((DecisionNode) parent, child);
         } else if (parent instanceof ChanceNode) {

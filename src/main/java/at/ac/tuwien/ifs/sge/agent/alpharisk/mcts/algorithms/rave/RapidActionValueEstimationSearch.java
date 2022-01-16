@@ -55,7 +55,7 @@ public class RapidActionValueEstimationSearch extends DefaultMonteCarloTreeSearc
 
         var statistics = NodeStatistics.of(RaveNode.AMAF_VALUE, currentValue);
 
-        while (!current.isRoot()) {
+        while (current != null) {
             if (current.getState().getCurrentPlayer() != currentPlayer) {
                 currentValue = 1.0 - currentValue;
                 currentPlayer = current.getState().getCurrentPlayer();
@@ -84,6 +84,7 @@ public class RapidActionValueEstimationSearch extends DefaultMonteCarloTreeSearc
     }
 
     private List<Node> getPlayedActionSiblings(Node node, Set<RiskAction> actions) {
+        if (node.isRoot()) return new ArrayList<>();
         return node.getParent().expandedChildren().stream()
                 .filter(n -> !n.getAction().equals(node.getAction()))
                 .filter(n -> n.getState().getCurrentPlayer() == node.getState().getCurrentPlayer())

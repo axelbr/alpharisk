@@ -54,6 +54,8 @@ public class RaveNode extends NodeWrapper {
     @Override
     public double getValue() {
         double beta = beta();
+        int visits = Math.max(1, this.visits);
+        int amafVisits = Math.max(1, this.amafVisits);
         return beta * (amafValue / amafVisits) + (1 - beta) * (value / visits);
     }
 

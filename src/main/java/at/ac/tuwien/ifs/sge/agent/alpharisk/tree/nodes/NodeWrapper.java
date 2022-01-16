@@ -35,7 +35,7 @@ public abstract class NodeWrapper implements Node {
 
     @Override
     public double getValue() {
-        return 0;
+        return node.getValue();
     }
 
     @Override
