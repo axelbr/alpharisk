@@ -6,7 +6,8 @@ import java.util.stream.IntStream;
 
 public class StateHeuristics {
     public static ValueFunction territoryRatioHeuristic() {
-        return s ->  (double) s.getBoard().getNrOfTerritoriesOccupiedByPlayer(s.getCurrentPlayer()) / s.getBoard().getTerritories().size();
+        return s -> (double) s.getBoard().getNrOfTerritoriesOccupiedByPlayer(s.getCurrentPlayer()) /
+                    s.getBoard().getTerritories().size();
     }
 
     public static ValueFunction continentRatioHeuristic() {
@@ -17,6 +18,8 @@ public class StateHeuristics {
     }
 
     public static ValueFunction bonusRatioHeuristic() {
-        return s -> (double) s.computeBonus(s.getCurrentPlayer()) / IntStream.range(0,s.getBoard().getNumberOfPlayers()).map(s::computeBonus).sum();
+        return s -> (double) s.computeBonus(s.getCurrentPlayer()) /
+                    IntStream.range(0, s.getBoard().getNumberOfPlayers()).map(s::computeBonus).sum();
     }
+
 }

@@ -1,5 +1,6 @@
 package at.ac.tuwien.ifs.sge.agent.alpharisk.domain.states;
 
+import at.ac.tuwien.ifs.sge.agent.alpharisk.mcts.ActionValueFunction;
 import at.ac.tuwien.ifs.sge.game.risk.board.*;
 
 import java.util.List;
@@ -9,6 +10,12 @@ import java.util.stream.Collectors;
 public abstract class RiskState {
     private Risk risk;
     private Phase phase;
+
+    public void setUtilityFunction(ActionValueFunction utilityFunction) {
+        this.utilityFunction = utilityFunction;
+    }
+
+    private ActionValueFunction utilityFunction;
 
     public RiskState(Risk risk, Phase phase) {
         this.risk = risk;
@@ -28,6 +35,8 @@ public abstract class RiskState {
     public double getUtility() {
         return risk.getUtilityValue(risk.getCurrentPlayer());
     }
+
+    public double getActionUtility(RiskAction action){return utilityFunction.evaluate(this, action);}
 
     public Risk getGame() {
         return risk;

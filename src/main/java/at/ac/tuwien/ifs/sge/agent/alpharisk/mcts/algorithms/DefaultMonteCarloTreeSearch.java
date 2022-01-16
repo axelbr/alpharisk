@@ -1,5 +1,6 @@
 package at.ac.tuwien.ifs.sge.agent.alpharisk.mcts.algorithms;
 
+import at.ac.tuwien.ifs.sge.agent.alpharisk.domain.heuristics.StateHeuristics;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.domain.states.RiskState;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.mcts.MonteCarloTreeSearch;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.mcts.ValueFunction;
@@ -17,10 +18,11 @@ import at.ac.tuwien.ifs.sge.util.pair.Pair;
 import lombok.Setter;
 
 import java.util.List;
-import java.util.function.Function;
 
 @Setter
 public class DefaultMonteCarloTreeSearch implements MonteCarloTreeSearch<RiskState, RiskAction> {
+
+    private final static double DISCOUNT = 1;
 
     public final static String VISITS = "visits";
     public final static String VALUE = "value";
@@ -38,7 +40,7 @@ public class DefaultMonteCarloTreeSearch implements MonteCarloTreeSearch<RiskSta
         rolloutPolicy = new RandomRolloutPolicy();
         simulationStrategy = new FullPlayoutSimulationStrategy();
         expansionStrategy = new ExpandRandomAction();
-        utilityFunction = RiskState::getUtility;
+        utilityFunction = sample((StateHeuristics.territoryRatioHeuristic()));
     }
 
     @Override
@@ -48,6 +50,10 @@ public class DefaultMonteCarloTreeSearch implements MonteCarloTreeSearch<RiskSta
 
     protected ValueFunction sample(ValueFunction f){
         return s->Math.random()<f.evaluate(s)?1.0:0.0;
+    }
+
+    protected ValueFunction wonOrUtility(ValueFunction f){
+        return s-> Math.max(s.getUtility(),f.evaluate(s));
     }
 
     @Override
@@ -94,7 +100,7 @@ public class DefaultMonteCarloTreeSearch implements MonteCarloTreeSearch<RiskSta
         var current = node;
         var lastState = playout.get(playout.size() - 1).getA();
         var currentPlayer = node.getState().getCurrentPlayer();
-        var currentValue = utilityFunction.evaluate(lastState)*Math.pow(0.999,playout.size());
+        var currentValue = utility(lastState)*Math.pow(DISCOUNT,playout.size());
         NodeStatistics statistics = NodeStatistics.of(VISITS,1);
         while (current != null) {
             if (current.getState().getCurrentPlayer() != currentPlayer) {

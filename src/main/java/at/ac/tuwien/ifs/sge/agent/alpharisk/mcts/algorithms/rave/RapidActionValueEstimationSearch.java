@@ -27,7 +27,6 @@ public class RapidActionValueEstimationSearch extends DefaultMonteCarloTreeSearc
         this.configuration = configuration;
         setSimulationStrategy(new LimitedDepthSimulation(32));
         setTreePolicy(new HeuristicUCTPolicy(0.5));
-        setUtilityFunction(StateHeuristics.bonusRatioHeuristic());
     }
 
     public static Configuration getDefaultConfiguration() {

@@ -5,5 +5,6 @@ import at.ac.tuwien.ifs.sge.game.risk.board.RiskAction;
 
 import java.util.function.BiFunction;
 
-public interface ActionValueFunction extends BiFunction<RiskState, RiskAction, Double> {
+public interface ActionValueFunction{
+    double evaluate(RiskState state, RiskAction action);
 }

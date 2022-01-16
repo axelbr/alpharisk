@@ -1,5 +1,7 @@
 package at.ac.tuwien.ifs.sge.agent.alpharisk.domain.states;
 
+import at.ac.tuwien.ifs.sge.agent.alpharisk.domain.heuristics.ActionHeuristics;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.mcts.ActionValueFunction;
 import at.ac.tuwien.ifs.sge.game.risk.board.Risk;
 import at.ac.tuwien.ifs.sge.game.risk.board.RiskAction;
 
@@ -17,6 +19,7 @@ public class ReinforceState extends RiskState{
         this.denomination = denomination;
         this.blockingTerritories = blockingTerritories;
         possibleActions = computePossibleActions(risk);
+        setUtilityFunction(ActionHeuristics.borderSecurityThreatHeuristic());
     }
 
     public ReinforceState(Risk risk, Phase phase) {

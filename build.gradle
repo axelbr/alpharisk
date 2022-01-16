@@ -65,10 +65,13 @@ shadowJar {
     minimize()
 }
 
-def conf = 'RAVE-bon'
-task shadowJarDeploy(type: ShadowJar) {
+def conf = 'RAVE-MCter'
+
+task customFatJar(type: Jar) {
+    duplicatesStrategy = DuplicatesStrategy.WARN
+    from(sourceSets.main.output)
     archiveClassifier.set(conf)
-    destinationDirectory = file('environment/agents')
+    destinationDirectory=file('environment/agents')
 
     manifest {
         attributes('Sge-Type': 'agent',
@@ -76,10 +79,10 @@ task shadowJarDeploy(type: ShadowJar) {
                 'Agent-Name': 'AlphaRisk'+conf)
     }
 
-
+    from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
     exclude("at/ac/tuwien/ifs/sge/agent/alphabetaagent")
     exclude("at/ac/tuwien/ifs/sge/agent/mctsagent")
     exclude("at/ac/tuwien/ifs/sge/agent/randomagent")
     exclude("at/ac/tuwien/ifs/sge/agent/risk")
-    minimize()
+    with jar
 }
