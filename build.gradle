@@ -65,7 +65,7 @@ shadowJar {
     minimize()
 }
 
-def conf = 'RAVE-MCter'
+def conf = 'RAVE-bon'
 
 task customFatJar(type: Jar) {
     duplicatesStrategy = DuplicatesStrategy.WARN

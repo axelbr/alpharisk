@@ -1,7 +1,7 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="default_random" type="JarApplication">
     <option name="JAR_PATH" value="$PROJECT_DIR$/environment/sge-1.0.2-exe.jar" />
-    <option name="PROGRAM_PARAMETERS" value="match sge-risk-1.0.2-exe.jar agents/alpharisk-1.0-dev.jar agents/sge-randomagent-1.0.1.jar -c 4 -vv -b boards/risk_simple_3.yaml" />
+    <option name="PROGRAM_PARAMETERS" value="match sge-risk-1.0.2-exe.jar agents/alpharisk-1.0-dev.jar agents/sge-randomagent-1.0.1.jar -c 3 -vv" />
     <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/environment" />
     <option name="ALTERNATIVE_JRE_PATH" />
     <method v="2">

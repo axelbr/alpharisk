@@ -40,7 +40,7 @@ public class DefaultMonteCarloTreeSearch implements MonteCarloTreeSearch<RiskSta
         rolloutPolicy = new RandomRolloutPolicy();
         simulationStrategy = new FullPlayoutSimulationStrategy();
         expansionStrategy = new ExpandRandomAction();
-        utilityFunction = sample((StateHeuristics.territoryRatioHeuristic()));
+        utilityFunction = wonOrUtility(StateHeuristics.bonusRatioHeuristic());
     }
 
     @Override

@@ -7,6 +7,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class FortifyState extends RiskState {
+    private final int IDLE_TROOPS_SIZE = 10;
     private final Set<RiskAction> actions;
 
     public FortifyState(Risk risk, Phase phase) {
@@ -19,7 +20,7 @@ public class FortifyState extends RiskState {
         var possibleActions = state.getPossibleActions();
         Map<Integer, Map<Integer, List<Integer>>> fortifications = new HashMap<>();
         var frontFortifications = possibleActions.stream()
-                .filter(a -> a.fortifyingId() >= 0 && board.neighboringEnemyTerritories(a.fortifiedId()).size() > 0)
+                .filter(a -> a.fortifyingId() >= 0 && (board.neighboringEnemyTerritories(a.fortifiedId()).size() > 0 || a.troops()>=IDLE_TROOPS_SIZE))
                 .collect(Collectors.toSet());
         for (var action: frontFortifications) {
             if (!fortifications.containsKey(action.fortifyingId())) {
