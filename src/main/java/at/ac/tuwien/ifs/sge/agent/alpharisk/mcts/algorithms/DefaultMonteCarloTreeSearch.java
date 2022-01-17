@@ -40,7 +40,7 @@ public class DefaultMonteCarloTreeSearch implements MonteCarloTreeSearch<RiskSta
         rolloutPolicy = new RandomRolloutPolicy();
         simulationStrategy = new FullPlayoutSimulationStrategy();
         expansionStrategy = new ExpandRandomAction();
-        utilityFunction = wonOrUtility(StateHeuristics.bonusRatioHeuristic());
+        utilityFunction = sample(scale(wonOrUtility(StateHeuristics.bonusRatioHeuristic()),0.5));
     }
 
     @Override
@@ -54,6 +54,10 @@ public class DefaultMonteCarloTreeSearch implements MonteCarloTreeSearch<RiskSta
 
     protected ValueFunction wonOrUtility(ValueFunction f){
         return s-> Math.max(s.getUtility(),f.evaluate(s));
+    }
+
+    protected ValueFunction scale(ValueFunction f, double scalar){
+        return s->f.evaluate(s)*scalar;
     }
 
     @Override

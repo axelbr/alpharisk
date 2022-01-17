@@ -29,7 +29,7 @@ public class HeuristicUCTSearch extends DefaultMonteCarloTreeSearch {
     public static Configuration getDefaultConfiguration() {
         var config = new BaseConfiguration();
         config.setProperty("explorationConstant", 0.5);
-        config.setProperty("rolloutHorizon", 32);
+        config.setProperty("rolloutHorizon", 64);
         return config;
     }
 }

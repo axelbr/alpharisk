@@ -47,15 +47,16 @@ dependencies {
 }
 
 
-
+def conf = ''
+//def conf = 'dev'
 shadowJar {
-    archiveClassifier.set("dev")
+    archiveClassifier.set(conf)
     destinationDirectory = file('environment/agents')
 
     manifest {
         attributes('Sge-Type': 'agent',
                 'Agent-Class': 'at.ac.tuwien.ifs.sge.agent.alpharisk.AlphaRiskAgent',
-                'Agent-Name': 'AlphaRiskAgent')
+                'Agent-Name': 'AlphaRiskAgent'+conf)
     }
 
     exclude("at/ac/tuwien/ifs/sge/agent/alphabetaagent")
@@ -65,9 +66,7 @@ shadowJar {
     minimize()
 }
 
-def conf = 'RAVE-bon'
-
-task customFatJar(type: Jar) {
+task customShadowJar(type: ShadowJar) {
     duplicatesStrategy = DuplicatesStrategy.WARN
     from(sourceSets.main.output)
     archiveClassifier.set(conf)
@@ -84,5 +83,5 @@ task customFatJar(type: Jar) {
     exclude("at/ac/tuwien/ifs/sge/agent/mctsagent")
     exclude("at/ac/tuwien/ifs/sge/agent/randomagent")
     exclude("at/ac/tuwien/ifs/sge/agent/risk")
-    with jar
+    minimize()
 }

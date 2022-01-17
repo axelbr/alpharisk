@@ -28,7 +28,7 @@ public class AlphaRiskAgent extends AbstractGameAgent<Risk, RiskAction> implemen
 
     public AlphaRiskAgent(final Logger log) {
         super(0.75, 5L, TimeUnit.SECONDS, log);
-        search = MCTSFactory.make(MCTSFactory.RAVE);
+        search = MCTSFactory.make(MCTSFactory.HEURISTIC_UCT);
         NodeFactory.setInstance(new RiskNodeFactory());
         //NodeFactory.setInstance(new WrappedNodeFactory<>(new RiskNodeFactory());
         currentPhase = RiskState.Phase.INITIAL_SELECT;

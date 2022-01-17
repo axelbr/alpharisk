@@ -18,8 +18,19 @@ public class StateHeuristics {
     }
 
     public static ValueFunction bonusRatioHeuristic() {
-        return s -> (double) s.computeBonus(s.getCurrentPlayer()) /
-                    IntStream.range(0, s.getBoard().getNumberOfPlayers()).map(s::computeBonus).sum();
+
+        return s -> {
+            var board = s.getBoard();
+            int territoryBonus = board.getTerritoriesOccupiedByPlayer(s.getCurrentPlayer()).size();
+            int contintentBonus = board.getContinentIds().stream()
+                    .filter(c -> s.controlsContinent(c,s.getCurrentPlayer()))
+                    .map(board::getContinentBonus)
+                    .reduce(0, Integer::sum);
+            //int tradeInBonus = board.hasToTradeInCards(player) ? board.getTradeInBonus() : 0;
+            var bonus = territoryBonus / 3 + contintentBonus;
+            var all_bonuses = IntStream.range(0, s.getBoard().getNumberOfPlayers()).map(s::computeBonus).sum();
+            return bonus/all_bonuses;
+        };
     }
 
 }
