@@ -1,14 +1,12 @@
 package at.ac.tuwien.ifs.sge.agent.alpharisk;
 
-import java.util.concurrent.TimeUnit;
-
 import at.ac.tuwien.ifs.sge.agent.AbstractGameAgent;
 import at.ac.tuwien.ifs.sge.agent.GameAgent;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.domain.RiskNodeFactory;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.domain.states.RiskState;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.domain.states.StateFactory;
-import at.ac.tuwien.ifs.sge.agent.alpharisk.mcts.factories.MCTSFactory;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.mcts.MonteCarloTreeSearch;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.mcts.factories.MCTSFactory;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.tree.factories.NodeFactory;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.tree.nodes.Node;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.visualization.BoardVisualization;
@@ -16,8 +14,9 @@ import at.ac.tuwien.ifs.sge.agent.alpharisk.visualization.TreeVisualization;
 import at.ac.tuwien.ifs.sge.engine.Logger;
 import at.ac.tuwien.ifs.sge.game.risk.board.Risk;
 import at.ac.tuwien.ifs.sge.game.risk.board.RiskAction;
-import at.ac.tuwien.ifs.sge.util.Util;
 import guru.nidi.graphviz.engine.Format;
+
+import java.util.concurrent.TimeUnit;
 
 public class AlphaRiskAgent extends AbstractGameAgent<Risk, RiskAction> implements GameAgent<Risk, RiskAction> {
 
@@ -32,7 +31,7 @@ public class AlphaRiskAgent extends AbstractGameAgent<Risk, RiskAction> implemen
         NodeFactory.setInstance(new RiskNodeFactory());
         //NodeFactory.setInstance(new WrappedNodeFactory<>(new RiskNodeFactory());
         currentPhase = RiskState.Phase.INITIAL_SELECT;
-        this.log_vis = false;
+        this.log_vis = true;
     }
 
     public void setUp(final int numberOfPlayers, final int playerId) {
@@ -44,17 +43,17 @@ public class AlphaRiskAgent extends AbstractGameAgent<Risk, RiskAction> implemen
         root = updateSearchTree(game);
         int counter = 0;
 
-        if (currentPhase == RiskState.Phase.INITIAL_REINFORCE) {
+        /*if (currentPhase == RiskState.Phase.INITIAL_REINFORCE) {
             return Util.selectRandom(game.getPossibleActions());
-        }
+        }*/
 
         while (!this.shouldStopComputation()) {
             search.runIteration(root);
-            if(log_vis) logIteration(counter);
+            if (log_vis) logIteration(counter);
             counter++;
         }
         log.info(String.format("Run %d iterations. Expanded nodes: %d.", counter, root.size()));
-        if(log_vis) logResults();
+        if (log_vis) logResults();
         return search.getBestAction(root);
     }
 

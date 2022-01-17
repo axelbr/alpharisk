@@ -3,7 +3,7 @@ package at.ac.tuwien.ifs.sge.agent.alpharisk.mcts.algorithms.rave;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.domain.heuristics.StateHeuristics;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.domain.states.RiskState;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.mcts.algorithms.DefaultMonteCarloTreeSearch;
-import at.ac.tuwien.ifs.sge.agent.alpharisk.mcts.policies.treepolicies.HeuristicUCTPolicy;
+import at.ac.tuwien.ifs.sge.agent.alpharisk.mcts.policies.treepolicies.RAVEPolicy;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.mcts.simulation.LimitedDepthSimulation;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.tree.nodes.Node;
 import at.ac.tuwien.ifs.sge.agent.alpharisk.tree.nodes.NodeStatistics;
@@ -25,8 +25,9 @@ public class RapidActionValueEstimationSearch extends DefaultMonteCarloTreeSearc
     public RapidActionValueEstimationSearch(Configuration configuration) {
         super();
         this.configuration = configuration;
-        setSimulationStrategy(new LimitedDepthSimulation(32));
-        setTreePolicy(new HeuristicUCTPolicy(0.5));
+        setSimulationStrategy(new LimitedDepthSimulation(configuration.getInt("rolloutHorizon")));
+        setTreePolicy(new RAVEPolicy(configuration.getDouble("explorationConstant"), wonOrUtility(StateHeuristics.bonusRatioHeuristic())));
+        setUtilityFunction(sample(wonOrUtility(StateHeuristics.bonusRatioHeuristic())));
     }
 
     public static Configuration getDefaultConfiguration() {
@@ -39,7 +40,7 @@ public class RapidActionValueEstimationSearch extends DefaultMonteCarloTreeSearc
 
     @Override
     public void runIteration(Node root) {
-        root.getStatistics().update(BIAS,configuration.getDouble(BIAS));
+        root.getStatistics().update(BIAS, configuration.getDouble(BIAS));
         super.runIteration(root);
     }
 
@@ -52,7 +53,7 @@ public class RapidActionValueEstimationSearch extends DefaultMonteCarloTreeSearc
         var currentPlayer = node.getState().getCurrentPlayer();
         var currentValue = utility(lastState);
 
-        var statistics = NodeStatistics.of(AMAF_VISITS, 1).with(AMAF_VALUE, currentValue);
+        var statistics = NodeStatistics.of(AMAF_VISITS, 1).with(AMAF_VALUE, currentValue).with(BIAS,configuration.getDouble(BIAS));
 
         while (current != null) {
             if (current.getState().getCurrentPlayer() != currentPlayer) {
@@ -63,7 +64,9 @@ public class RapidActionValueEstimationSearch extends DefaultMonteCarloTreeSearc
             for (Node sibling : getPlayedActionSiblings(current, playerActions.getOrDefault(currentPlayer, new HashSet<>()))) {
                 var amafValue = sibling.getStatistics().getDouble(AMAF_VALUE);
                 var amafVisits = sibling.getStatistics().getDouble(AMAF_VISITS);
-                sibling.update(statistics.concat(AMAF_VALUE, (currentValue - amafValue) / amafVisits));
+                var bias = sibling.getStatistics().getDouble(BIAS);
+                sibling.update(statistics.concat(AMAF_VALUE, (currentValue * bias - (1 - bias) * amafValue) /
+                                                             (bias * amafVisits)));
             }
             current.update(statistics.concat(VALUE, currentValue));
             current = current.getParent();
