@@ -16,7 +16,7 @@ public class HeuristicUCTSearch extends DefaultMonteCarloTreeSearch {
         setTreePolicy(new HeuristicUCTPolicy(config.getDouble("explorationConstant"), wonOrUtility(StateHeuristics.bonusRatioHeuristic())));
         setRolloutPolicy(new RandomRolloutPolicy());
         setSimulationStrategy(new LimitedDepthSimulation(config.getInt("rolloutHorizon")));
-        setUtilityFunction(sample(wonOrUtility(StateHeuristics.bonusRatioHeuristic())));
+        setUtilityFunction(sample(StateHeuristics.territoryRatioHeuristic()));
     }
 
     public static Configuration getDefaultConfiguration() {

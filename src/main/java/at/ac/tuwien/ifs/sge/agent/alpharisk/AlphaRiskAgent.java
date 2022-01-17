@@ -31,7 +31,7 @@ public class AlphaRiskAgent extends AbstractGameAgent<Risk, RiskAction> implemen
         NodeFactory.setInstance(new RiskNodeFactory());
         //NodeFactory.setInstance(new WrappedNodeFactory<>(new RiskNodeFactory());
         currentPhase = RiskState.Phase.INITIAL_SELECT;
-        this.log_vis = true;
+        this.log_vis = false;
     }
 
     public void setUp(final int numberOfPlayers, final int playerId) {
